@@ -6,11 +6,12 @@ import { state } from './game/state.js';
 import { events } from './game/events.js';
 import { loop } from './game/loop.js';
 import { features } from './features/index.js';
+import { musicSystem } from './audio/music.js';
 
 await storage.init();
 state.load();
 
-loop.use(features);
+loop.use([musicSystem, ...features]);
 loop.build();
 
 if (FLAGS.debug)

@@ -22,6 +22,10 @@ Then open http://localhost:8141. (`just play` serves it and opens the browser; `
 | Pause | Esc or P | Start | Pause button |
 | Menus | Arrows, Space or Enter, Esc to go back | D-pad or stick, A, B | Tap |
 
+## Credits
+
+The music is chiptune composed and rendered with [music-generator](https://github.com/gridlocdev/music-generator), on its chip instruments, which are made in code.
+
 ## For developers
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

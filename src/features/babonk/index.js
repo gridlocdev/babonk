@@ -4,6 +4,7 @@ import { FLAGS } from '../../platform/engine.js';
 import { input } from '../../platform/input.js';
 import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
 import { sfx } from '../../audio/sfx.js';
+import { music, setMusic, setMusicArea } from '../../audio/music.js';
 import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
 import { letterIn, spellOut } from '../../ui/kinetic.js';
@@ -46,6 +47,7 @@ function showPause()
         <div class="col">
             <button class="btn" id="b-go">Resume</button>
             <button class="btn" id="b-sound">Sound: ${settings.get('sound') ? 'on' : 'off'}</button>
+            <button class="btn" id="b-music">Music: ${music.on ? 'on' : 'off'}</button>
             <button class="btn" id="b-menu">End the run</button>
         </div>
     `);
@@ -59,6 +61,12 @@ function showPause()
             const on = settings.toggle('sound');
             root.querySelector('#b-sound').textContent = `Sound: ${on ? 'on' : 'off'}`;
             sfx.setEnabled(on);
+            sfx.play('uiPick');
+        } }],
+        [{ el: root.querySelector('#b-music'), pick()
+        {
+            setMusic(!music.on);
+            root.querySelector('#b-music').textContent = `Music: ${music.on ? 'on' : 'off'}`;
             sfx.play('uiPick');
         } }],
         [{ el: root.querySelector('#b-menu'), pick: ()=> { sfx.play('uiMove'); cards.hide(); controls(); setMode('menu'); } }],
@@ -134,6 +142,16 @@ function playStep(dt)
 
 const pressed = ()=> input.holdPressed() || input.confirm();
 
+// the soundtrack follows the screen: the title, each well its own (keeping on under the pause menu), the rest between
+// wells, and a one-shot for the run's end (music/, from tools/music/songs.js)
+function musicFor()
+{
+    if (mode === 'play' || mode === 'paused') return `well${Math.min(run.well, 2) + 1}`;
+    if (mode === 'rest') return 'rest';
+    if (mode === 'over' || mode === 'initials') return result.won ? 'win' : 'over';
+    return 'title';
+}
+
 export default {
     id: 'babonk',
     build({ state })
@@ -145,6 +163,7 @@ export default {
         run = createRun();
         touch.onPause(()=> { if (mode === 'play') showPause(); });
         controls();
+        setMusicArea(musicFor);
 
         const start = FLAGS.debug ? FLAGS.params.get('shot') : null;
         if (start === 'zoo') { touch.show(false); setMode('zoo'); }

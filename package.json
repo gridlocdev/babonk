@@ -9,6 +9,7 @@
     "check": "node tools/coupling-report.mjs --strict"
   },
   "devDependencies": {
+    "electron": "^44.9.2",
     "playwright": "1.65.0"
   }
 }

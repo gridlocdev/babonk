@@ -12,12 +12,14 @@ src/
   game/       events (pub/sub), state (the save), loop (the system list)
   ui/         cards (the pause menu's buttons), initials (the three-letter entry), kinetic (banner letters), touch
               controls, settings, pixel-text (lib/pixel-font.js on a 2D canvas), style.css
-  audio/      sfx.js (Web Audio: sounds baked from code), sfx-defs.js (the menu sounds)
+  audio/      sfx.js (Web Audio: sounds baked from code), sfx-defs.js (the menu sounds), music.js (the soundtrack),
+              tracks-data.js (generated: each track's file, tempo and loop points)
   features/
     babonk/   sim.js (rules), level.js (the tile grid), *-data.js (numbers, chunks, sprites and animations, sounds),
               pose.js (which animation the hero shows), view.js, zoo.js (debug sprite zoo), index.js (screens and glue)
   dev/        ?debug tools, loaded only with that flag
   main.js     boot
+tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the rendered mp3s
 ```
 
 `world/` and `render/` have no files yet; they sit in the same tier as `ui/` and `audio/` in `architecture.json`, ready if needed.
@@ -50,6 +52,12 @@ src/
 `index.js` runs the screens: the title (where the page opens) → play → rest between wells → game over → initials when the score makes the top ten → the title. The pause menu (Resume, Sound, End the run) and the initials are HTML cards from `ui/cards.js` over the canvas, in the game's colours; everything else is drawn on the canvas.
 
 Its sounds are `lib/synth.js` code in `sounds-data.js`, registered with `sfx.define` as `babonk` + name; the menu sounds `uiMove` and `uiPick` are in `audio/sfx-defs.js`. The top ten and the last initials are the `babonk` save slice; the sound setting is the `core` slice. The save is one JSON string under the storage key `babonk-save-v1`.
+
+## Music
+
+The soundtrack is chiptune written as song specs for music-generator (`tools/music/songs.js`; the direction is `docs/AUDIO.md`). `just music` composes and renders them with music-generator's own code in a hidden Electron window (it needs a checkout at `../../apps/music-generator`, or `just music <path> [ids]`, and ffmpeg), writes `music/<id>.mp3` and the generated `audio/tracks-data.js`, and checks every mp3 decodes in step with its render. A looping track keeps one tempo and meter to its loop's end (`push: 0`), so the game can count its bars.
+
+`audio/music.js` plays on the effects' context (`sfx.context`, through `sfx.musicOut`, after their compressor), so it starts with the first key or tap and never with `?mute`. The area function decides the track; a change waits for the next bar line and crossfades. Babonk sets it with `setMusicArea(musicFor)`: the title, a track per well, the rest, and one-shots for game over and the win. The on/off setting is the `music` save slice; Sound off suspends everything.
 
 ## Debug flags
 

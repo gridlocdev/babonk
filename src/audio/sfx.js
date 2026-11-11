@@ -4,7 +4,7 @@ import { FLAGS } from '../platform/engine.js';
 import { RATE } from '../lib/synth.js';
 import { SFX_DEFS } from './sfx-defs.js';
 
-let ctx = null, master = null, enabled = !FLAGS.mute;
+let ctx = null, master = null, musicBus = null, enabled = !FLAGS.mute;
 const buffers = {}, last = {};
 // baked sounds a game brings along: { name: def }, in the same form as SFX_DEFS
 const defs = {};
@@ -20,6 +20,9 @@ function start()
     const out = ctx.createGain();
     out.gain.value = .85;
     master.connect(out).connect(ctx.destination);
+    // the soundtrack (audio/music.js) joins after the compressor, so the effects don't pump it
+    musicBus = ctx.createGain();
+    musicBus.connect(out);
     for (const [name, def] of Object.entries(SFX_DEFS)) bake(name, def);
     for (const [name, def] of Object.entries(defs)) bake(name, def);
 }
@@ -34,6 +37,9 @@ function bake(name, def)
 for (const type of ['keydown', 'pointerdown']) addEventListener(type, ()=> { start(); ctx?.resume(); }, { capture: true });
 
 export const sfx = {
+    // the context and where music goes, once audio has started; null before the first key or tap
+    get context() { return ctx; },
+    get musicOut() { return musicBus; },
     setEnabled(on)
     {
         enabled = on && !FLAGS.mute;

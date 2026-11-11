@@ -1,4 +1,5 @@
 port := "8141"
+music_generator := "../../apps/music-generator"
 
 # list recipes
 default:
@@ -54,6 +55,12 @@ dead:
 bench *args:
     @[ -d node_modules/playwright ] || just install-bench
     node tools/bench.mjs "$@"
+
+# render the soundtrack (tools/music/songs.js) with music-generator into music/ and src/audio/tracks-data.js
+# needs ffmpeg and a music-generator checkout; e.g. just music ~/src/apps/music-generator well1 rest
+music path=music_generator *tracks:
+    @[ -d node_modules/electron ] || npm install
+    npx electron tools/music/render.mjs {{path}} {{tracks}}
 
 # run the unit tests for lib/, *-data.js and the rules
 test:
