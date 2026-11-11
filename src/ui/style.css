@@ -1,0 +1,38 @@
+/* Babonk's three colours: the ground, pale mint and a mid green for danger and reward (sprites-data.js PALETTE) */
+:root {
+  --ground: #0b0f1e; --mint: #dcefe2; --accent: #469e1a;
+  --ui: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ground); color: var(--mint); font: 700 16px var(--ui); }
+body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: none; overscroll-behavior: none; }
+[hidden] { display: none !important; }
+
+/* the game's screen: platform/engine.js sizes and centres it on whole device pixels; this keeps its pixels square */
+#game { position: absolute; display: block; image-rendering: pixelated; }
+
+/* ---- cards over the screen: the pause menu and the initials */
+#screen { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 2vh, 20px); padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(12px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; touch-action: pan-y; }
+#screen.dim { background: #0b0f1ee0; }
+.banner { font: 800 clamp(36px, 9vmin, 88px)/1 var(--ui); letter-spacing: .08em; color: var(--accent); text-shadow: .06em .06em 0 #000; }
+.banner span { display: inline-block; }
+.btn { all: unset; cursor: pointer; box-sizing: border-box; padding: 9px 22px; min-height: 42px; background: var(--ground); border: 3px solid var(--mint); color: var(--mint); font: 700 clamp(14px, 2.2vmin, 18px) var(--ui); letter-spacing: .06em; text-align: center; text-transform: uppercase; }
+.btn.focus { background: var(--mint); color: var(--ground); }
+.btn.big { font-size: clamp(20px, 4.4vmin, 34px); padding: 12px 26px; }
+.col { display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: min(320px, 86vw); }
+
+/* the high-score initials: a letter with ▲ above and ▼ below, three across */
+.ini { display: flex; gap: clamp(12px, 3vmin, 28px); justify-content: center; margin: 2vmin 0 3vmin; }
+.ini-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ini-col .btn { min-width: 2.6em; padding-inline: .6em; }
+.ini-letter { font: 800 clamp(48px, 12vmin, 110px)/1 var(--ui); color: var(--mint); min-width: 1em; text-align: center; }
+
+/* ---- touch: a stick bottom left, the hold button bottom right, pause top right */
+#touch { position: fixed; inset: 0; z-index: 25; pointer-events: none; }
+#stick { position: absolute; left: calc(14px + env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: clamp(110px, 34vmin, 160px); aspect-ratio: 1; border-radius: 50%; border: 3px solid #dcefe266; background: #0b0f1e99; pointer-events: auto; touch-action: none; }
+#stick i { position: absolute; left: 50%; top: 50%; width: 44%; height: 44%; margin: -22% 0 0 -22%; border-radius: 50%; background: var(--mint); opacity: .8; }
+#touch button { position: absolute; pointer-events: auto; touch-action: none; border-radius: 50%; color: var(--mint); font: 800 clamp(18px, 4.6vmin, 26px) var(--ui); letter-spacing: .04em; }
+#tHold { right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: clamp(92px, 28vmin, 132px); aspect-ratio: 1; background: #469e1acc; border: 4px solid var(--mint); }
+#tPause { right: calc(12px + env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); width: 44px; height: 44px; background: #0b0f1eb0; border: 2px solid #dcefe299; font: 700 14px var(--ui) !important; }
+
+#debug { position: fixed; z-index: 70; pointer-events: none; bottom: 8px; left: 8px; padding: 2px 6px; font: 12px ui-monospace, Menlo, monospace; color: #8f8; background: rgba(0, 0, 0, .8); white-space: pre; }

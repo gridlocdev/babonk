@@ -1,0 +1,353 @@
+// Babonk's pixel art in its three colours: K the deep blue-black ground, W pale mint, O a mid green for danger and
+// reward; '.' is clear. The three sit far apart in lightness (L* 5, 58, 93), so they separate without hue. Every sprite faces right. ANIMS strings frames into animations, each frame held for its own
+// time (key poses longer than in-betweens); the zoo (?debug&shot=zoo) plays every one of them.
+export const PALETTE = { K: '#0b0f1e', W: '#dcefe2', O: '#469e1a' };
+
+export const SPRITES = {
+    // ---- the hero, 6 × 8
+    stand: [
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        '.W..W.',
+        '.W..W.',
+    ],
+    blink: [
+        '.WWWW.',
+        'WWWWWW',
+        'WWWWWW',
+        'WWKWKW',
+        '.WWWW.',
+        '.WOOW.',
+        '.W..W.',
+        '.W..W.',
+    ],
+    // a run: stride, pass (a pixel lower), the other stride, pass
+    run0: [
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        '.W..W.',
+        'W....W',
+    ],
+    run1: [
+        '......',
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        '..WW..',
+    ],
+    run2: [
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        '..W.W.',
+        '.W...W',
+    ],
+    // landing and bouncing: two pixels shorter, wider at the hips
+    squash: [
+        '......',
+        '......',
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        'WWOOWW',
+        'WW..WW',
+    ],
+    // going up: legs drawn together under
+    rise: [
+        '.WWWW.',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        '..WW..',
+        '..WW..',
+    ],
+    // coming down: arms up, legs apart
+    fall: [
+        'W....W',
+        'WWWWWW',
+        'WWKWKW',
+        'WWWWWW',
+        '.WWWW.',
+        '.WOOW.',
+        'W....W',
+        '......',
+    ],
+    hurt: [
+        'W.WW.W',
+        'WWWWWW',
+        'WKWWKW',
+        'WWKKWW',
+        '.WWWW.',
+        '.WOOW.',
+        'W....W',
+        '......',
+    ],
+    // the bonk: curled into a ball, an eye going round as it spins
+    ball0: [
+        '..WW..',
+        '.WKWW.',
+        'WWOOWW',
+        'WOOOOW',
+        'WOOOOW',
+        'WWOOWW',
+        '.WWWW.',
+        '..WW..',
+    ],
+    ball1: [
+        '..WW..',
+        '.WWWW.',
+        'WWOOKW',
+        'WOOOOW',
+        'WOOOOW',
+        'WWOOWW',
+        '.WWWW.',
+        '..WW..',
+    ],
+    ball2: [
+        '..WW..',
+        '.WWWW.',
+        'WWOOWW',
+        'WOOOOW',
+        'WOOOOW',
+        'WWOOWW',
+        '.WWKW.',
+        '..WW..',
+    ],
+    ball3: [
+        '..WW..',
+        '.WWWW.',
+        'WWOOWW',
+        'WOOOOW',
+        'WOOOOW',
+        'WKOOWW',
+        '.WWWW.',
+        '..WW..',
+    ],
+    // one stretched frame as a dash leaves: up or down, and sideways (8 × 6, drawn a pixel out each side)
+    smearV: [
+        '..WW..',
+        '..WW..',
+        '.WWWW.',
+        '.WOOW.',
+        '.WOOW.',
+        '.WOOW.',
+        '.WWWW.',
+        '..WW..',
+    ],
+    smearH: [
+        '..WWWW..',
+        '.WWOOWW.',
+        'WWOOOOWW',
+        'WWOOOOWW',
+        '.WWOOWW.',
+        '..WWWW..',
+    ],
+
+    // ---- foes, 8 × 8
+    walker0: [
+        '..OOOO..',
+        '.OOOOOO.',
+        'OOOOWOOW',
+        'OOOOWOOW',
+        'OOOOOOOO',
+        'OOOOOOOO',
+        '.OO..OO.',
+        '.O....O.',
+    ],
+    walker1: [
+        '........',
+        '..OOOO..',
+        '.OOOOOO.',
+        'OOOOWOOW',
+        'OOOOWOOW',
+        'OOOOOOOO',
+        'OOOOOOOO',
+        '..O..O..',
+    ],
+    floater0: [
+        'W......W',
+        'WW.OO.WW',
+        '.WOOOOW.',
+        '.OWOOWO.',
+        '.OOOOOO.',
+        '..OOOO..',
+        '...OO...',
+        '........',
+    ],
+    floater1: [
+        '........',
+        '...OO...',
+        '..OOOO..',
+        '.OWOOWO.',
+        'WOOOOOOW',
+        'WWOOOOWW',
+        'W..OO..W',
+        '........',
+    ],
+    // a floater after you: wide eyes with dark pupils, beating its wings harder
+    floaterMad0: [
+        'W......W',
+        'WW.OO.WW',
+        '.WOOOOW.',
+        '.WKOOKW.',
+        '.OOOOOO.',
+        '..OKKO..',
+        '...OO...',
+        '........',
+    ],
+    floaterMad1: [
+        '........',
+        '...OO...',
+        '..OOOO..',
+        '.WKOOKW.',
+        'WOOOOOOW',
+        'WWOKKOWW',
+        'W..OO..W',
+        '........',
+    ],
+    // over a floater the moment it spots you
+    bang: [
+        'WW',
+        'WW',
+        'WW',
+        'WW',
+        '..',
+        'WW',
+    ],
+    spiker0: [
+        '.W.W.W.W',
+        'WWWWWWWW',
+        'OOOOOOOO',
+        'OOOOWOOW',
+        'OOOOOOOO',
+        'OOOOOOOO',
+        '.OO..OO.',
+        '.O....O.',
+    ],
+    spiker1: [
+        'W.W.W.W.',
+        'WWWWWWWW',
+        'OOOOOOOO',
+        'OOOOWOOW',
+        'OOOOOOOO',
+        'OOOOOOOO',
+        'OOOOOOOO',
+        '..O..O..',
+    ],
+
+    // ---- tiles, 8 × 8
+    block: [
+        'WWWWWWWK',
+        'WWWWWWWK',
+        'WWWWWWWK',
+        'KKKKKKKK',
+        'WWWKWWWW',
+        'WWWKWWWW',
+        'WWWKWWWW',
+        'KKKKKKKK',
+    ],
+    // the same block cracked, and chipped at a corner, so a wall isn't one stamp repeated
+    block1: [
+        'WWWWWWWK',
+        'WWKWWWWK',
+        'WWWKWWWK',
+        'KKKKKKKK',
+        'WWWKWWWW',
+        'WWWKWKWW',
+        'WWWKWWKW',
+        'KKKKKKKK',
+    ],
+    block2: [
+        'WWWWWWWK',
+        'WWWWWWWK',
+        'WWWWWWWK',
+        'KKKKKKKK',
+        'WWWKWWWW',
+        'WWWKWWWW',
+        'WWWKWWW.',
+        'KKKKKK..',
+    ],
+    crate: [
+        'WWWWWWWW',
+        'WW....WW',
+        'W.W..W.W',
+        'W..WW..W',
+        'W..WW..W',
+        'W.W..W.W',
+        'WW....WW',
+        'WWWWWWWW',
+    ],
+    spikes: [
+        '........',
+        '........',
+        '.O...O..',
+        '.O...O..',
+        'OOO.OOO.',
+        'OOO.OOO.',
+        'OOOOOOOO',
+        'OOOOOOOO',
+    ],
+
+    // ---- a star knocked out of a foe, 5 × 5, twinkling between green and mint
+    star0: [
+        '..O..',
+        '.OOO.',
+        'OOWOO',
+        '.OOO.',
+        '.O.O.',
+    ],
+    star1: [
+        '..W..',
+        '.WWW.',
+        'WWOWW',
+        '.WWW.',
+        '.W.W.',
+    ],
+};
+
+// name: { frames, times (seconds each), loop }. One frame and no times is a still.
+export const ANIMS = {
+    idle:   { frames: ['stand', 'blink'], times: [2.2, .12] },
+    run:    { frames: ['run0', 'run1', 'run2', 'run1'], times: [.09, .07, .09, .07] },
+    squash: { frames: ['squash'] },
+    rise:   { frames: ['rise'] },
+    fall:   { frames: ['fall'] },
+    hurt:   { frames: ['hurt'] },
+    ball:   { frames: ['ball0', 'ball1', 'ball2', 'ball3'], times: [.04, .04, .04, .04] },
+    smearV: { frames: ['smearV'] },
+    smearH: { frames: ['smearH'] },
+    walker:  { frames: ['walker0', 'walker1'], times: [.22, .22] },
+    floater: { frames: ['floater0', 'floater1'], times: [.16, .16] },
+    floaterMad: { frames: ['floaterMad0', 'floaterMad1'], times: [.08, .08] },
+    bang:    { frames: ['bang'] },
+    spiker:  { frames: ['spiker0', 'spiker1'], times: [.26, .26] },
+    star:    { frames: ['star0', 'star1'], times: [.2, .12] },
+};
+
+// the hero's animations in the order the zoo shows them
+export const HERO = ['idle', 'run', 'squash', 'rise', 'fall', 'hurt', 'ball', 'smearV', 'smearH'];
+
+// the plain block most of the time, a cracked or chipped one now and then, always the same one at the same tile
+export const BLOCKS = ['block', 'block', 'block', 'block', 'block', 'block1', 'block', 'block', 'block2', 'block'];
+export function blockAt(tx, ty)
+{
+    const h = Math.imul(tx * 374761393 + ty * 668265263, 1274126177) >>> 0;
+    return BLOCKS[((h ^ h >>> 13) >>> 0) % BLOCKS.length];
+}

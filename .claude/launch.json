@@ -1,0 +1,1 @@
+{ "version": "0.0.1", "configurations": [ { "name": "babonk", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "8141"], "port": 8141 } ] }
