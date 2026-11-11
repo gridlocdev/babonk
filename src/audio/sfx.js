@@ -1,17 +1,20 @@
 // Web Audio: sounds baked once from code (sfx-defs.js, and each game's own through define()).
 // Browsers keep audio off until the first key or tap, so everything starts then.
 //
-// The mix: effects → their bus (EFFECTS_LEVEL × the Effects slider) → a compressor ┐
-//          music (audio/music.js, its own level × the Music slider) → musicOut ───┴→ master (the Master slider) → a limiter → out
-// The two levels set where effects sit against the music at the same slider steps (measured, see docs/AUDIO.md).
+// The mix: effects → their bus (EFFECTS_LEVEL × Effects volume) → a compressor ┐
+//          music (audio/music.js, its own level × Music volume) → musicOut ─────┴→ master (Master volume) → a limiter → out
+// The two levels set where effects sit against the music at the default volumes (measured, see docs/AUDIO.md).
+// Settings (game/settings.js) apply here: the three volumes, Mono audio, and Play in the background.
 import { FLAGS } from '../platform/engine.js';
 import { RATE } from '../lib/synth.js';
-import { stepGain } from '../lib/volume.js';
-import { settings } from '../game/settings.js';
+import { events } from '../game/events.js';
+import { setting } from '../game/settings.js';
 import { SFX_DEFS } from './sfx-defs.js';
 
-const EFFECTS_LEVEL = 1.25;     // the effects bus at slider step 10; the default step 8 is -6 dB from here
-const SLIDE = .04;              // seconds (time constant) for a slider change to settle
+const EFFECTS_LEVEL = 1;        // the effects bus at full Effects volume; about 4 dB over the music at the defaults
+const SLIDE = .04;              // seconds (time constant) for a volume change to settle
+/** a volume setting (0 to 1) as a gain: squared, so the slider sounds even across its length */
+export const volumeGain = (v)=> Math.max(0, Math.min(1, v ?? 1)) ** 2;
 
 let ctx = null, master = null, effectsBus = null, masterGain = null, musicBus = null;
 const enabled = !FLAGS.mute;
@@ -38,20 +41,25 @@ function start()
     // the soundtrack (audio/music.js) joins after the compressor, so the effects don't pump it
     musicBus = ctx.createGain();
     musicBus.connect(masterGain);
-    applyVolume(settings.volume, true);
+    applyAll(true);
     for (const [name, def] of Object.entries(SFX_DEFS)) bake(name, def);
     for (const [name, def] of Object.entries(defs)) bake(name, def);
 }
 
-function applyVolume(v, now = false)
+function applyAll(now = false)
 {
     if (!ctx) return;
     const t = ctx.currentTime;
     const set = (param, value)=> { if (now) param.value = value; else param.setTargetAtTime(value, t, SLIDE); };
-    set(masterGain.gain, stepGain(v.master));
-    set(effectsBus.gain, EFFECTS_LEVEL * stepGain(v.effects));
+    set(masterGain.gain, volumeGain(setting('audio.master')));
+    set(effectsBus.gain, EFFECTS_LEVEL * volumeGain(setting('audio.sfx')));
+    // mono: everything folded to one channel at the master, then spread to both ears again
+    const mono = !!setting('audio.mono');
+    masterGain.channelCount = mono ? 1 : 2;
+    masterGain.channelCountMode = mono ? 'explicit' : 'max';
+    masterGain.channelInterpretation = 'speakers';
 }
-settings.onChange((v)=> applyVolume(v));
+events.on('settings:changed', ({ id })=> { if (id.startsWith('audio.')) applyAll(); });
 
 function bake(name, def)
 {
@@ -61,8 +69,14 @@ function bake(name, def)
     buffers[name] = b;
 }
 for (const type of ['keydown', 'pointerdown']) addEventListener(type, ()=> { start(); ctx?.resume(); }, { capture: true });
-// a phone may suspend audio while the tab is away; pick it back up on return
-document.addEventListener('visibilitychange', ()=> { if (!document.hidden) ctx?.resume().catch(()=> {}); });
+// a hidden tab goes quiet unless Play in the background is on; sound comes back with the tab (a phone may have
+// suspended it meanwhile)
+document.addEventListener('visibilitychange', ()=>
+{
+    if (!ctx) return;
+    if (document.hidden) { if (!setting('audio.background')) ctx.suspend().catch(()=> {}); }
+    else ctx.resume().catch(()=> {});
+});
 
 export const sfx = {
     // the context and where music goes, once audio has started; null before the first key or tap

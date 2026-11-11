@@ -10,9 +10,9 @@
 // its track's loop a whole number of times; near its place (audio/places.js) it is started in step with the track and
 // swells in, and a while after the player leaves it is stopped and its decoded audio let go.
 import { MOBILE } from '../platform/engine.js';
-import { stepGain } from '../lib/volume.js';
-import { settings } from '../game/settings.js';
-import { sfx } from './sfx.js';
+import { events } from '../game/events.js';
+import { setting } from '../game/settings.js';
+import { sfx, volumeGain } from './sfx.js';
 import { TRACKS } from './tracks-data.js';
 
 // Babonk has no layers yet, so no places: a layer would be silent. audio/places.js from the template adds them.
@@ -20,8 +20,8 @@ const nearness = (name)=> 0;
 // the sound effects' context; music starts with it, after the first key or tap (and never with ?mute)
 let audioContext = null, audioMasterGain = null;
 
-const LEVEL = 1.6;          // the music bus at slider step 10; the default step 8 is -6 dB from here. Set against the
-                            // effects' level in audio/sfx.js so the two sit close (docs/AUDIO.md)
+const LEVEL = 1.6;          // the music bus at full Music volume. Set against the effects' level in audio/sfx.js so
+                            // the two sit close at the default volumes (docs/AUDIO.md)
 const SLIDE = .05;          // seconds (time constant) for a slider change to settle
 const MAX_WAIT = 2.5;       // seconds; when a bar is longer than this, a change waits for the next beat instead
 const FADE = [1.2, 3];      // seconds; an old track fades out over a bar, kept inside these
@@ -37,10 +37,12 @@ export const music = {
     /** its layers that are playing, and how loud each is asked to be */ get layers() { return Object.fromEntries([...current?.layers.values() ?? []].map((l)=> [l.id, +l.level.toFixed(2)])); },
 };
 
-let bus = null, busLevel = -1, settleUntil = 0, volume = 1;
+let bus = null, busLevel = -1, settleUntil = 0, volume = 1, duck = 1;
 let area = ()=> 'main';     // the track that plays when no cue is held
 /** @param {() => string} fn the area's track id, asked every frame */
 export const setMusicArea = (fn)=> { area = fn; };
+/** lowers the music (0 to 1) without stopping it, as under a pause menu; 1 for full */
+export const setMusicDuck = (v)=> { duck = v; };
 let current = null;         // { id, track, src, gain, when, at, shift, cue, layers }: the source starts at `when`, its first beat is `at`
 const fading = [];          // tracks on their way out
 const cues = [];
@@ -268,7 +270,7 @@ function musicUpdate()
 {
     if (!bus) { musicStart(); if (!bus) return; }
     const now = audioContext.currentTime;
-    const level = LEVEL * volume;
+    const level = LEVEL * volume * duck;
     if (level !== busLevel) { busLevel = level; bus.gain.setTargetAtTime(level, now, SLIDE); }
     if (now < settleUntil) return;      // a moment for a cue (an intro) to ask before the area starts
     // a one-shot played to its end: its cue is spent, and the area takes the music back
@@ -299,8 +301,8 @@ export function musicStart()
 export const musicSystem = {
     build()
     {
-        volume = stepGain(settings.volume.music);
-        settings.onChange((v)=> { volume = stepGain(v.music); });
+        volume = volumeGain(setting('audio.music'));
+        events.on('settings:changed', ({ id, value })=> { if (id === 'audio.music') volume = volumeGain(value); });
     },
     update: musicUpdate,
 };

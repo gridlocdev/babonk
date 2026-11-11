@@ -20,14 +20,15 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 
 ## Done: settings and the mix
 
-- [x] Settings card with Master, Music and Effects sliders (keys and pad with hold-to-repeat, click or drag, touch), Reset to defaults, Back. From the pause menu, or the title (Esc, pad menu, the touch pause button).
-- [x] Volumes saved at once in `core`; old Sound/Music on/off saves carried over; bad values fall back to defaults.
-- [x] Effects brought down about 4 dB and music up about 4 dB, from 12 dB apart to about 4; a limiter on the output.
-- [x] Leaving the tab mid-run pauses it; audio resumes when the tab comes back.
+- [x] Settings on the shared settings table (`docs/SETTINGS.md`): tabs for Audio, Controls, Display and Accessibility; rows for volumes, mono, background sound, stick dead zone, brightness, frame rate, full screen, screen shake, reduce flashing and game speed. Keys and pad (hold to repeat, Q/E or LB/RB for tabs), click or drag, touch. Reset per tab after a second press.
+- [x] Only changed values saved, in `core.settings`; older saves carried over; reduced motion turns shake off and flashing down by default.
+- [x] Pause: Continue, Settings, Restart, Quit to title, the last two confirmed; the music drops under it. Leaving the tab mid-run pauses it, and sound stops unless Play in the background is on.
+- [x] Effects brought down and music up, from 12 dB apart to about 2; a limiter on the output.
 
 ## For you
 
-- [ ] Listen to the new mix (http://localhost:8141, play a well). Are the effects level with the music now, or should they sit higher or lower? Change `EFFECTS_LEVEL` in `audio/sfx.js` or `LEVEL` in `audio/music.js`, or just try the sliders (Esc on the title, http://localhost:8141/?debug&shot=settings).
+- [ ] Listen to the new mix (http://localhost:8141, play a well). Are the effects level with the music now, or should they sit higher or lower? Change `EFFECTS_LEVEL` in `audio/sfx.js` or `LEVEL` in `audio/music.js`, or try the sliders (Esc on the title, http://localhost:8141/?debug&shot=settings).
+- [ ] Try Settings with a real gamepad: LB/RB for tabs, the d-pad held on a slider, B to go back.
 
 - [ ] Listen to the soundtrack (http://localhost:8141, click to start; the rest and game over: http://localhost:8141/?debug&shot=rest, http://localhost:8141/?debug&shot=over). Do the darker 5/4 and 3/4 wells fit the fall, and are the drums interesting enough now? Each well's tempo and mode, and the hook, are in `tools/music/songs.js`.
 - [ ] Do the loops wrap without a hitch? The wells loop about every 58–68 s; long wells will hear them twice. The title still uses the 4/4 hook; should it go 5/4 too?
@@ -46,5 +47,6 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 ## Follow-ups
 
 - [ ] Babonk has 13 chunks. More, and a few per well with a new idea (moving blocks, crumbling ledges), would keep runs from repeating.
+- [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/SETTINGS.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
 - [ ] On the title, the touch pause button now opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] A home-screen icon and web manifest.

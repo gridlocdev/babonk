@@ -4,7 +4,8 @@ import { FLAGS } from '../../platform/engine.js';
 import { input } from '../../platform/input.js';
 import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
 import { sfx } from '../../audio/sfx.js';
-import { setMusicArea } from '../../audio/music.js';
+import { setMusicArea, setMusicDuck } from '../../audio/music.js';
+import { setting } from '../../game/settings.js';
 import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
 import { letterIn, spellOut } from '../../ui/kinetic.js';
@@ -28,7 +29,8 @@ let bot = null;
 const VIEW = FLAGS.debug ? FLAGS.params.get('view') ?? '' : '';
 const ZOO_T = FLAGS.debug && FLAGS.params.has('t') ? Number(FLAGS.params.get('t')) : undefined;
 
-function setMode(m) { mode = m; modeTime = 0; }
+// the music drops under the pause menu and its settings, and comes back with play
+function setMode(m) { mode = m; modeTime = 0; setMusicDuck(m === 'paused' || m === 'settings' && settingsFrom === 'paused' ? .4 : 1); }
 function controls() { touch.show('hold'); touch.holdLabel('BONK'); }
 
 function startRun(seed = FLAGS.debug ? CONFIG.seed : (Math.random() * 2 ** 31) | 0)
@@ -46,9 +48,10 @@ function showPause(focus = 0)
     cards.show(`
         <div class="banner" style="color:${PALETTE.O}"></div>
         <div class="col">
-            <button class="btn" id="b-go">Resume</button>
+            <button class="btn" id="b-go">Continue</button>
             <button class="btn" id="b-settings">Settings</button>
-            <button class="btn" id="b-menu">End the run</button>
+            <button class="btn" id="b-restart">Restart</button>
+            <button class="btn" id="b-menu">Quit to title</button>
         </div>
     `);
     const root = cards.root;
@@ -57,8 +60,28 @@ function showPause(focus = 0)
     cards.menu([
         [{ el: root.querySelector('#b-go'), pick: back }],
         [{ el: root.querySelector('#b-settings'), pick: ()=> { sfx.play('uiPick'); openSettings('paused'); } }],
-        [{ el: root.querySelector('#b-menu'), pick: ()=> { sfx.play('uiMove'); cards.hide(); controls(); setMode('menu'); } }],
+        [{ el: root.querySelector('#b-restart'), pick: ()=> confirm('Restart the run?', 2, ()=> { cards.hide(); controls(); startRun(); }) }],
+        [{ el: root.querySelector('#b-menu'), pick: ()=> confirm('Quit to the title? This run will end.', 3, ()=> { cards.hide(); controls(); setMode('menu'); }) }],
     ], { focus: [focus, 0], back, move: ()=> sfx.play('uiMove') });
+}
+
+// Restart and Quit lose the run, so each asks first; No is focused, and No or Back returns to the pause menu
+function confirm(question, from, yes)
+{
+    sfx.play('uiMove');
+    cards.show(`
+        <div class="ask">${question}</div>
+        <div class="row-btns">
+            <button class="btn" id="b-no">No</button>
+            <button class="btn" id="b-yes">Yes</button>
+        </div>
+    `);
+    const root = cards.root;
+    const no = ()=> { sfx.play('uiMove'); showPause(from); };
+    cards.menu([[
+        { el: root.querySelector('#b-no'), pick: no },
+        { el: root.querySelector('#b-yes'), pick: ()=> { sfx.play('uiPick'); yes(); } },
+    ]], { back: no, move: ()=> sfx.play('uiMove') });
 }
 
 // settings, from the title or the pause menu; Back returns there
@@ -129,7 +152,8 @@ function playStep(dt)
     if (input.pause()) { showPause(); return; }
     const m = input.move();
     const ctrl = bot ? autoPilot() : { x: m.x, y: m.y, held: input.hold(), pressed: input.holdPressed() };
-    acc = Math.min(acc + dt, STEP * 4);
+    // Game speed slows the run itself; menus, music and sounds keep their pace
+    acc = Math.min(acc + dt * setting('a11y.gameSpeed'), STEP * 4);
     while (acc >= STEP && run.state === 'play')
     {
         step(run, STEP, ctrl);

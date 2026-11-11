@@ -37,6 +37,9 @@ export function pixelScreen(w, h)
     return g;
 }
 
+// the Brightness setting: a filter on the one canvas (1 leaves it alone)
+export function setBrightness(v) { canvas.style.filter = v === 1 ? '' : `brightness(${v})`; }
+
 // the whole game's clock: ?debug slow motion and fast forward change its speed
 export const clock = { speed: 1, now: 0 };
 

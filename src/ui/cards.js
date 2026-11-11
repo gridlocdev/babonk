@@ -6,7 +6,7 @@ import { input } from '../platform/input.js';
 const screen = /** @type {HTMLElement} */ (document.getElementById('screen'));
 const REPEAT_DELAY = .38, REPEAT_EVERY = .07;   // seconds: holding a direction repeats it
 
-let rows = null, ry = 0, rx = 0, onBack = null, onMove = null;
+let rows = null, ry = 0, rx = 0, onBack = null, onMove = null, onTick = null;
 let held = '', heldFor = 0, repeatAt = 0, lastTime = 0;
 
 function paint()
@@ -27,11 +27,13 @@ function go(dir)
     else if (dir === 'down' && ry < rows.length - 1) { ry++; rx = Math.min(rx, rows[ry].length - 1); }
     else return;
     paint();
-    onMove?.(rows[ry][rx]);
+    onMove?.(rows[ry][rx], 'nav');
 }
 
 export const cards = {
     get open() { return !!rows; },
+    /** the focused row's index */
+    get focusRow() { return ry; },
     root: screen,
     // html is written into the layer first; rows name its elements. focus: [row, col]
     show(html, { dim = true, cls = '' } = {})
@@ -41,19 +43,20 @@ export const cards = {
         screen.hidden = false;
         rows = null;
     },
-    menu(list, { focus = [0, 0], back = null, move = null } = {})
+    // tick() runs first each step and returns true when it used the step (a screen's own keys, like switching tabs)
+    menu(list, { focus = [0, 0], back = null, move = null, tick = null } = {})
     {
         rows = list.map((r)=> r.filter((it)=> it?.el)).filter((r)=> r.length);
         if (!rows.length) { rows = null; return; }
         ry = Math.max(0, Math.min(focus[0], rows.length - 1));
         rx = Math.max(0, Math.min(focus[1], rows[ry].length - 1));
-        onBack = back; onMove = move;
+        onBack = back; onMove = move; onTick = tick;
         // a direction already held when the menu opens waits for a fresh press
         held = input.navHeld(); heldFor = 0; repeatAt = Infinity; lastTime = performance.now();
         rows.forEach((row, y)=> row.forEach((it, x)=>
         {
             const take = ()=> { if (rows && (ry !== y || rx !== x)) { ry = y; rx = x; paint(); return true; } return false; };
-            it.el.addEventListener('pointerenter', (e)=> { if (e.pointerType === 'mouse' && take()) onMove?.(it); });
+            it.el.addEventListener('pointerenter', (e)=> { if (e.pointerType === 'mouse' && take()) onMove?.(it, 'pointer'); });
             it.el.addEventListener('pointerdown', ()=> take());
             // a click made by a key (detail 0) is the keyboard's confirm, which update() already handles
             it.el.addEventListener('click', (e)=> { if (!rows || e.detail === 0) return; take(); activate(it); });
@@ -67,6 +70,8 @@ export const cards = {
         if (!rows) return;
         const t = performance.now(), dt = Math.min(.1, (t - lastTime) / 1000);
         lastTime = t;
+        if (onTick?.()) return;
+        if (!rows) return;
         const now = input.navHeld();
         const dir = input.nav();
         if (dir) { held = dir; heldFor = 0; repeatAt = REPEAT_DELAY; go(dir); return; }

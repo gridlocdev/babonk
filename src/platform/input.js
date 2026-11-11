@@ -18,7 +18,7 @@ addEventListener('pointerup', (e)=> { if (e.pointerType === 'mouse' && e.button 
 // ui/touch.js writes here: the stick (mx right, my up) and the hold button
 export const touchState = { mx: 0, my: 0, hold: false, holdPressed: false };
 
-let pad = null, padDown = new Set(), padPressed = new Set(), padNav = '';
+let pad = null, padDown = new Set(), padPressed = new Set(), padNav = '', deadzone = .15;
 function readPad()
 {
     pad = [...(navigator.getGamepads?.() ?? [])].find((p)=> p?.connected) ?? null;
@@ -41,7 +41,7 @@ export const input = {
         if (pad)
         {
             const gx = pad.axes[0] ?? 0, gy = -(pad.axes[1] ?? 0);
-            if (Math.hypot(gx, gy) > .16) { x = gx; y = gy; }
+            if (Math.hypot(gx, gy) > deadzone) { x = gx; y = gy; }
             if (padDown.has(14)) x = -1;
             if (padDown.has(15)) x = 1;
             if (padDown.has(12)) y = 1;
@@ -91,6 +91,11 @@ export const input = {
         }
         return '';
     },
+    // the settings screen's tabs: Q and E, or the shoulder buttons (LB 4, RB 5)
+    tabPrev: ()=> anyPressed('KeyQ') || padPressed.has(4),
+    tabNext: ()=> anyPressed('KeyE') || padPressed.has(5),
+    /** the stick's dead zone, from the Controls setting */
+    setDeadzone(v) { deadzone = v; },
     // a connected pad decides the prompts
     get hasPad() { return !!pad; },
 };

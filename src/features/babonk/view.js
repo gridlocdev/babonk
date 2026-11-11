@@ -3,6 +3,7 @@
 // count) come from the run's w.fx queue.
 import { MOBILE, pixelScreen } from '../../platform/engine.js';
 import { frameAt } from '../../lib/anim.js';
+import { setting } from '../../game/settings.js';
 import { pixelCentre, pixelText } from '../../ui/pixel-text.js';
 import { COLS, SCREEN, TILE, WELL_X } from './babonk-data.js';
 import { BLOCK, CRATE, SPIKES, tileAt } from './level.js';
@@ -64,7 +65,7 @@ function burst(e, colour, kick)
         const a = i / 8 * Math.PI * 2 + Math.random() * .4, v = 50 + Math.random() * 60;
         bits.push({ x: e.x, y: e.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, life: .5, c: colour });
     }
-    shake = Math.max(shake, kick);
+    shake = Math.max(shake, kick * setting('a11y.shake'));
 }
 
 // turn the run's effect queue into hits, bits, labels and shake
@@ -75,7 +76,8 @@ function takeFx(w)
         // a foe hit shows as a mint silhouette for the hit stop, then bursts
         if (e.kind === 'pop') hits.push({ ...e, name: frameOf(e.foe, clock + e.phase), life: e.hold });
         else if (e.kind === 'crate') burst(e, BONE, 1);
-        else if (e.kind === 'hurt') { shake = 4; flash = 2; }
+        // Screen shake scales the kick; Reduce flashing drops the whole-well flash (the hurt sound and blink remain)
+        else if (e.kind === 'hurt') { shake = 4 * setting('a11y.shake'); flash = setting('a11y.reduceFlashing') ? 0 : 2; }
         else if (e.kind === 'chain') labels.push({ text: `CHAIN x${e.n}`, x: e.x, y: e.y, life: 1 });
     }
     w.fx.length = 0;

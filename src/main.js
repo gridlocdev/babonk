@@ -3,15 +3,18 @@ import { FLAGS, clock, startLoop } from './platform/engine.js';
 import { clearPresses, pollInput } from './platform/input.js';
 import { storage } from './platform/storage.js';
 import { state } from './game/state.js';
+import { loadSettings } from './game/settings.js';
 import { events } from './game/events.js';
 import { loop } from './game/loop.js';
 import { features } from './features/index.js';
 import { musicSystem } from './audio/music.js';
+import { fpsSystem } from './ui/fps.js';
 
 await storage.init();
 state.load();
+loadSettings();
 
-loop.use([musicSystem, ...features]);
+loop.use([musicSystem, fpsSystem, ...features]);
 loop.build();
 
 if (FLAGS.debug)

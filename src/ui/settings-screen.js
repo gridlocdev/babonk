@@ -1,11 +1,20 @@
-// The settings card: Master, Music and Effects volume sliders, Reset to defaults and Back.
-// Sliders move with left and right (held to repeat), a click or drag along the bar, or a finger.
-// Every change is heard at once and saved at once (game/settings.js).
-import { STEPS, VOLUME_DEFAULTS } from '../lib/volume.js';
-import { settings } from '../game/settings.js';
+// The settings screen (docs/SETTINGS.md): a tab per group (Audio, Controls, Display, Accessibility), a row per setting
+// with its label on the left and its value on the right, a help line, and Reset to defaults at the end of each tab.
+//
+// Up and down move between rows; left and right change the focused value, one step a press, repeating while held;
+// confirm flips a toggle. A range also has a bar the mouse can drag and a finger slide. Q and E, or LB and RB, switch
+// tabs, as does moving along the tab row. Changes apply at once; Back saves and goes back to what opened the screen.
+import { MOBILE } from '../platform/engine.js';
+import { input } from '../platform/input.js';
+import { formatSetting } from '../lib/settings.js';
+import {
+    SCHEMA, changeSetting, resetSettingsGroup, saveSettings, setting, settingTabs, stepSettingBy,
+} from '../game/settings.js';
 import { cards } from './cards.js';
 
-const SLIDERS = [['master', 'Master'], ['music', 'Music'], ['effects', 'Effects']];
+let lastTab = 0;     // the tab the screen reopens on
+
+const esc = (s)=> String(s).replace(/[&<>"]/g, (c)=> ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /**
  * @param {{ close: () => void, sound: (what: 'move' | 'pick' | 'effects') => void, color?: string }} o
@@ -13,78 +22,183 @@ const SLIDERS = [['master', 'Master'], ['music', 'Music'], ['effects', 'Effects'
  */
 export function showSettings({ close, sound, color = '' })
 {
-    cards.show(`
-        <div class="banner" ${color ? `style="color:${color}"` : ''}>SETTINGS</div>
-        <div class="col settings">
-            ${SLIDERS.map(([key, label])=> `
-            <div class="btn slider" id="v-${key}" role="slider" aria-label="${label} volume"
-                 aria-valuemin="0" aria-valuemax="${STEPS}">
-                <span class="s-label">${label}</span>
-                <span class="s-track"><i></i></span>
-                <span class="s-num"></span>
-            </div>`).join('')}
-            <button class="btn" id="b-reset">Reset to defaults</button>
-            <button class="btn" id="b-back">Back</button>
-        </div>
-    `);
-    const root = cards.root;
-    const el = (id)=> /** @type {HTMLElement} */ (root.querySelector(id));
+    const tabs = settingTabs();
+    let tab = Math.min(lastTab, tabs.length - 1);
+    let armed = false;     // Reset to defaults was pressed once and waits for a second press
 
-    function paintSlider(key)
+    function render(focus = [1, 0])
     {
-        const v = settings.volume[key], s = el(`#v-${key}`);
-        s.setAttribute('aria-valuenow', String(v));
-        s.setAttribute('aria-valuetext', v ? `${v * 10}%` : 'off');
-        /** @type {HTMLElement} */ (s.querySelector('.s-track i')).style.width = `${v / STEPS * 100}%`;
-        s.querySelector('.s-num').textContent = v ? String(v * 10) : 'OFF';
-        s.classList.toggle('off', !v);
-    }
-    const paintAll = ()=> SLIDERS.forEach(([k])=> paintSlider(k));
+        lastTab = tab;
+        armed = false;
+        const { group, rows } = tabs[tab];
+        const keys = MOBILE ? ['', ''] : input.hasPad ? ['LB', 'RB'] : ['Q', 'E'];
+        cards.show(`
+            <div class="banner set-banner" ${color ? `style="color:${color}"` : ''}>SETTINGS</div>
+            <div class="tabs" role="tablist">
+                ${keys[0] ? `<span class="tab-key">${keys[0]}</span>` : ''}
+                ${tabs.map((t, i)=> `<button class="tab" role="tab" aria-selected="${i === tab}" data-i="${i}">${esc(t.label)}</button>`).join('')}
+                ${keys[1] ? `<span class="tab-key">${keys[1]}</span>` : ''}
+            </div>
+            <div class="col settings" role="tabpanel">
+                ${rows.map((e)=> `
+                <div class="btn row" data-id="${e.id}" ${e.type === 'range' ? `role="slider" aria-valuemin="${e.min}" aria-valuemax="${e.max}"` : `role="${e.type === 'toggle' ? 'switch' : 'button'}"`} aria-label="${esc(e.label)}">
+                    <span class="r-label">${esc(e.label)}</span>
+                    ${e.type === 'range' ? '<span class="r-bar"><i></i></span>' : ''}
+                    <span class="r-val"></span>
+                </div>`).join('')}
+                ${group === 'display' && document.fullscreenEnabled ? `
+                <div class="btn row" id="b-full" role="switch"><span class="r-label">Full screen</span><span class="r-val"></span></div>` : ''}
+                <button class="btn" id="b-reset">Reset to defaults</button>
+                <button class="btn" id="b-back">Back</button>
+            </div>
+            <div class="help" aria-live="polite"></div>
+        `);
+        const root = cards.root;
+        const help = /** @type {HTMLElement} */ (root.querySelector('.help'));
 
-    function set(key, step)
-    {
-        const before = settings.volume[key];
-        const after = settings.setVolume(key, step);
-        if (after === before) return;
-        paintSlider(key);
-        // hear it: the effects (and the whole mix, for master) with a sample, the music speaks for itself
-        if (key !== 'music') sound('effects');
-    }
-
-    // a drag along the bar sets the step under the pointer
-    for (const [key] of SLIDERS)
-    {
-        const s = el(`#v-${key}`), track = /** @type {HTMLElement} */ (s.querySelector('.s-track'));
-        let dragging = null;
-        const at = (e)=>
+        const paintRow = (id)=>
         {
-            const r = track.getBoundingClientRect();
-            set(key, Math.round((e.clientX - r.left) / r.width * STEPS));
+            const e = SCHEMA.find((s)=> s.id === id), el = root.querySelector(`[data-id="${id}"]`), v = setting(id);
+            if (!el) return;
+            el.querySelector('.r-val').textContent = formatSetting(e, v);
+            if (e.type === 'range')
+            {
+                el.setAttribute('aria-valuenow', String(v));
+                el.setAttribute('aria-valuetext', formatSetting(e, v));
+                /** @type {HTMLElement} */ (el.querySelector('.r-bar i')).style.width = `${(v - e.min) / (e.max - e.min) * 100}%`;
+            }
+            else el.setAttribute('aria-checked', String(!!v));
         };
-        s.addEventListener('pointerdown', (e)=>
+        const paintFull = ()=>
         {
-            const r = track.getBoundingClientRect();
-            // the bar and a little around it; a tap on the label leaves the value alone
-            if (e.clientX < r.left - 12) return;
-            dragging = e.pointerId;
-            s.setPointerCapture(e.pointerId);
-            at(e);
-        });
-        s.addEventListener('pointermove', (e)=> { if (e.pointerId === dragging) at(e); });
-        for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) s.addEventListener(t, ()=> { dragging = null; });
-    }
-    paintAll();
+            const el = root.querySelector('#b-full');
+            if (el) { el.querySelector('.r-val').textContent = document.fullscreenElement ? 'On' : 'Off'; el.setAttribute('aria-checked', String(!!document.fullscreenElement)); }
+        };
+        rows.forEach((e)=> paintRow(e.id));
+        paintFull();
+        document.onfullscreenchange = paintFull;
 
-    const back = ()=> { sound('move'); close(); };
-    cards.menu([
-        ...SLIDERS.map(([key])=> [{ el: el(`#v-${key}`), adjust: (d)=> set(key, settings.volume[key] + d) }]),
-        [{ el: el('#b-reset'), pick()
+        const helpFor = (it)=>
         {
-            const same = SLIDERS.every(([k])=> settings.volume[k] === VOLUME_DEFAULTS[k]);
-            settings.resetVolumes();
-            paintAll();
-            sound(same ? 'move' : 'pick');
-        } }],
-        [{ el: el('#b-back'), pick: back }],
-    ], { back, move: ()=> sound('move') });
+            if (it?.entry)
+            {
+                const e = it.entry, opt = e.type === 'choice' ? e.options.find((o)=> o.value === setting(e.id)) : null;
+                return (opt?.help ?? e.help ?? '') + (e.reload ? ' Takes effect after a restart.' : '');
+            }
+            return it?.help ?? '';
+        };
+        const showHelp = (it)=> { help.textContent = helpFor(it); };
+
+        // a change heard and seen at once; volumes play a sample through the new mix (music speaks for itself)
+        const changed = (id, did)=>
+        {
+            if (!did) return;
+            paintRow(id);
+            if (id === 'audio.sfx' || id === 'audio.master') sound('effects');
+            else if (!id.startsWith('audio.music')) sound('move');
+            showHelp(items.find((i)=> i.entry?.id === id));
+        };
+
+        // the bar: a drag sets the value under the pointer; letting go saves
+        for (const e of rows.filter((r)=> r.type === 'range'))
+        {
+            const el = /** @type {HTMLElement} */ (root.querySelector(`[data-id="${e.id}"]`)), bar = /** @type {HTMLElement} */ (el.querySelector('.r-bar'));
+            let drag = null;
+            const at = (ev)=>
+            {
+                const r = bar.getBoundingClientRect();
+                const f = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+                changed(e.id, changeSetting(e.id, e.min + f * (e.max - e.min)));
+            };
+            el.addEventListener('pointerdown', (ev)=>
+            {
+                const r = bar.getBoundingClientRect();
+                if (ev.clientX < r.left - 12 || ev.clientX > r.right + 12) return;     // the label and value leave it alone
+                drag = ev.pointerId;
+                el.setPointerCapture(ev.pointerId);
+                at(ev);
+            });
+            el.addEventListener('pointermove', (ev)=> { if (ev.pointerId === drag) at(ev); });
+            for (const t of ['pointerup', 'pointercancel']) el.addEventListener(t, ()=> { if (drag !== null) { drag = null; saveSettings(); } });
+        }
+
+        const resetBtn = /** @type {HTMLElement} */ (root.querySelector('#b-reset'));
+        const disarm = ()=> { if (armed) { armed = false; resetBtn.textContent = 'Reset to defaults'; } };
+        const items = [
+            ...rows.map((e)=> ({
+                entry: e,
+                el: /** @type {HTMLElement} */ (root.querySelector(`[data-id="${e.id}"]`)),
+                adjust: (d)=> changed(e.id, stepSettingBy(e.id, d)),
+                pick: e.type === 'range' ? null : ()=> changed(e.id, stepSettingBy(e.id, 1)),
+            })),
+            ...(root.querySelector('#b-full') ? [{
+                el: /** @type {HTMLElement} */ (root.querySelector('#b-full')),
+                help: 'Fill the screen. The browser leaves full screen with Esc.',
+                pick()
+                {
+                    sound('pick');
+                    if (document.fullscreenElement) document.exitFullscreen?.().catch(()=> {});
+                    else document.documentElement.requestFullscreen?.().catch(()=> {});
+                },
+            }] : []),
+            {
+                el: resetBtn,
+                help: `Put every ${tabs[tab].label} setting back.`,
+                pick()
+                {
+                    if (!armed) { armed = true; resetBtn.textContent = 'Press again to reset'; sound('move'); return; }
+                    armed = false;
+                    resetBtn.textContent = 'Reset to defaults';
+                    resetSettingsGroup(group);
+                    rows.forEach((e)=> paintRow(e.id));
+                    saveSettings();
+                    sound('pick');
+                },
+            },
+            { el: /** @type {HTMLElement} */ (root.querySelector('#b-back')), pick: back },
+        ];
+        const tabItems = [...root.querySelectorAll('.tab')].map((el, i)=> ({ el: /** @type {HTMLElement} */ (el), tab: i, pick: ()=> switchTab(i, true) }));
+
+        cards.menu([tabItems, ...items.map((it)=> [it])], {
+            focus,
+            back,
+            move(it, how)
+            {
+                disarm();
+                // moving along the tab row switches tabs; a mouse passing over one doesn't, a click does
+                if (it.tab !== undefined && it.tab !== tab && how === 'nav') { switchTab(it.tab, false); return; }
+                sound('move');
+                showHelp(it);
+            },
+            tick()
+            {
+                const d = input.tabPrev() ? -1 : input.tabNext() ? 1 : 0;
+                if (!d) return false;
+                const next = Math.max(0, Math.min(tabs.length - 1, tab + d));
+                if (next !== tab) switchTab(next, true);
+                return true;
+            },
+        });
+        // the row that has focus explains itself; on the tab row, the first row's help
+        showHelp(focus[0] > 0 ? [tabItems, ...items.map((i)=> [i])][focus[0]]?.[0] : null);
+    }
+
+    // a new tab keeps the focus where it was: on the tab row, or on the new tab's first row
+    function switchTab(i, keepRow)
+    {
+        if (i === tab) return;
+        tab = i;
+        sound('move');
+        render(keepRow ? [cards.focusRow > 0 ? 1 : 0, cards.focusRow > 0 ? 0 : tab] : [0, tab]);
+    }
+
+    function back()
+    {
+        document.onfullscreenchange = null;
+        saveSettings();
+        sound('move');
+        close();
+    }
+
+    render([1, 0]);
 }
