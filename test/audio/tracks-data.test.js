@@ -19,6 +19,12 @@ test('loops sit inside their files, on whole bars', ()=>
     {
         if (!t.loop) { assert.ok(t.end > 0 && t.end <= t.seconds, `${id}: a one-shot ends inside its file`); continue; }
         assert.ok(t.loop.start >= 0 && t.loop.end > t.loop.start && t.loop.end <= t.seconds, `${id}: loop inside the file`);
+        if (t.bars)
+        {
+            for (const at of [t.loop.start, t.loop.end]) assert.ok(t.bars.some((x)=> Math.abs(x - at) < 1e-3), `${id}: loop point ${at} on a bar line`);
+            assert.ok(t.bars.every((x, i)=> i === 0 || x > t.bars[i - 1]), `${id}: bar lines in order`);
+            continue;
+        }
         const bars = (t.loop.end - t.loop.start) / (60 / t.tempo * t.beatsPerBar);
         assert.ok(Math.abs(bars - Math.round(bars)) < 1e-3, `${id}: loop is ${bars} bars`);
     }

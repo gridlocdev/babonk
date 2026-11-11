@@ -16,11 +16,12 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 
 - [x] Chiptune soundtrack in D dorian from one hook (`docs/AUDIO.md`): title, one loop per well, the rest, game-over and win stings, rendered with music-generator (`just music`).
 - [x] It follows the screens and changes on the bar; Music on/off in the pause menu, kept in the save.
+- [x] The wells darker (D minor, phrygian, harmonic minor) and in 5/4 and 3/4, with hand-written drums.
 
 ## For you
 
-- [ ] Listen to the soundtrack (http://localhost:8141, click to start; the rest and game over: http://localhost:8141/?debug&shot=rest, http://localhost:8141/?debug&shot=over). Does it fit the look and the pace of the fall? Is it too loud against the effects (`LEVEL` in `audio/music.js`)? Each well's tempo and mode, and the hook, are in `tools/music/songs.js`.
-- [ ] Do the loops wrap without a hitch? The wells loop about every 52–60 s; long wells will hear them twice.
+- [ ] Listen to the soundtrack (http://localhost:8141, click to start; the rest and game over: http://localhost:8141/?debug&shot=rest, http://localhost:8141/?debug&shot=over). Do the darker 5/4 and 3/4 wells fit the fall, and are the drums interesting enough now? Is it too loud against the effects (`LEVEL` in `audio/music.js`)? Each well's tempo and mode, and the hook, are in `tools/music/songs.js`.
+- [ ] Do the loops wrap without a hitch? The wells loop about every 58–68 s; long wells will hear them twice. The title still uses the 4/4 hook; should it go 5/4 too?
 
 - [ ] Play it (http://localhost:8141, `just serve`). Does the bonk feel good: homing speed and time (`homeSpeed`, `homeTime`), dash (`dashSpeed`, `dashTime`), bounce heights (`bounceV`, `stompV`, `wallKickV`) in `features/babonk/babonk-data.js`? Only a bot has played it.
 - [ ] Is three wells (10, 14 and 18 chunks deep) the right length for a run, and is the third hard enough? `WELLS` in `babonk-data.js`.

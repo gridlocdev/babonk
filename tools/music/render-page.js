@@ -121,17 +121,34 @@ async function render(id)
     const gainDb = Math.min(TARGET_RMS_DB - rmsDb, PEAK_DB - peakDb);
     const gain = 10 ** (gainDb / 20);
 
+    // a track whose meter changes lists its bar lines (seconds into the file, to its loop's end), as the game can't
+    // count them from one meter
+    let bars = null;
+    if (score.sections.some((s)=> s.beatsPerBar !== score.beatsPerBar))
+    {
+        const last = loop ? loop.end : at(score.beats);
+        bars = [];
+        for (const s of score.sections)
+            for (let b = s.beat; b < s.beat + s.beats - 1e-9; b += s.beatsPerBar)
+            {
+                const x = +(at(b) - cut).toFixed(5);
+                if (x >= 0 && x <= last + 1e-4) bars.push(x);
+            }
+        if (loop && !bars.some((x)=> Math.abs(x - loop.end) < 1e-4)) bars.push(loop.end);
+    }
+
     const frames = chans[0].length;
     const info = {
         title: score.title, tempo: score.tempo, beatsPerBar: score.beatsPerBar, offset: KEEP, seconds: frames / RATE, end: loop ? null : at(score.beats),
-        frames, sampleRate: RATE, loop, gainDb,
+        frames, sampleRate: RATE, loop, gainDb, bars,
     };
     return { info, wav: wav32(chans, gain) };
 }
 
-// The game finds bar lines from one tempo and one meter (tracks-data.js), so a looping track must keep both from its
-// start to its loop's end. The composer pushes the tempo a little from the climax on, and a section can set its own
-// tempo or meter; any of them before the loop's end would put the game's bars out of step with the music.
+// The game finds bar lines from one tempo (tracks-data.js), so a looping track must keep it from its start to its
+// loop's end. The composer pushes the tempo a little from the climax on, and a section can set its own tempo; either
+// before the loop's end would put the game's beats out of step with the music. A section may change the meter: the
+// track then lists its bar lines (`bars`).
 function steadyGrid(id, score, loop)
 {
     const until = score.sections[loop[1]].beat;
@@ -139,8 +156,6 @@ function steadyGrid(id, score, loop)
     if (change)
         throw new Error(`${id}: the tempo changes at beat ${change.beat}, before the loop's end at beat ${until}, and the game counts bars at one tempo. ` +
             `Set push: 0 in the spec (the climax's push), or take the tempo off that section`);
-    const odd = score.sections.slice(0, loop[1]).find((s)=> s.beatsPerBar !== score.beatsPerBar);
-    if (odd) throw new Error(`${id}: ${odd.label} is in a meter of its own, before the loop's end, and the game counts bars in one meter`);
 }
 
 // interleaved 32-bit float WAV

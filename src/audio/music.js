@@ -107,6 +107,12 @@ function position(v, now)
 function nextDownbeat(v, earliest)
 {
     const t = v.track, p = position(v, earliest);
+    // a track that changes meter lists its bar lines
+    if (t.bars)
+    {
+        const bar = t.bars.find((x)=> x >= p - 1e-6);
+        if (bar !== undefined && bar - p <= MAX_WAIT) return earliest + (bar - p);
+    }
     const step = spb(t) * (spb(t) * t.beatsPerBar <= MAX_WAIT ? t.beatsPerBar : 1);
     const beat = p - t.offset;
     if (beat < 0) return earliest - beat;

@@ -1,6 +1,6 @@
 # Audio
 
-**Identity: arcade plunge.** Driving and bouncy but a bit dark: bare NES-style chip voices in D dorian, a hook that bounces up off the tonic and then falls back down. Falling with style.
+**Identity: arcade plunge.** Driving and dark: bare NES-style chip voices in D, a hook that bounces up off the tonic and then falls back down. The wells limp: 5/4 verses and hook, 3/4 builds and bridges, so the beat never settles. Falling with style, and never quite safe.
 
 - **Palette**: pulse leads (50%, 25%, 12.5%, PWM) that echo each other, a triangle or pulse bass running eighths, tracker arpeggios, the chip kits. Soft triangle, pluck and a PWM pad only where the player rests. No GM instruments, no reverb-heavy pads, nothing realistic.
 - **Touchstones**: the NES's driving minor-key action loops (two pulses, triangle, noise); Downwell's short, punchy arcade energy; a tracker's shimmering one-voice arpeggios.
@@ -15,14 +15,14 @@ A narrow well in three colours: blue-black void, mint brick walls and ledges, mi
 
 ## The tracks
 
-One home key (D), one motif (the hook's first bar, `1:0.5 5:0.5 8 7:0.5 5:0.5 3`), varied per track. Specs in `tools/music/songs.js`.
+One home key (D), one motif (the hook's first bar, `1:0.5 5:0.5 8 7:0.5 5:0.5 3`; in 5/4 for the wells, `1:0.5 5:0.5 8:1.5 7:0.5 5 3`), varied per track. Every well has the same form: verse and hook in 5/4 (3 + 2), the build and bridge in 3/4. Their drums are written by hand, per section, in `songs.js` (`drumsBy`), since the composer's own odd-meter beat is plain. Specs in `tools/music/songs.js`.
 
 | Track | Plays on | Keeps | Changes |
 |---|---|---|---|
 | `title` | the title | the hook, D dorian | 132 bpm, no drums, a 50% pulse over a pad; jumping in is the step up |
-| `well1` | well 1 | the hook stated in full | 144 bpm, the bare NES: two pulses, triangle bass, NES kit |
-| `well2` | well 2 | the motif, sequenced | D minor, 156 bpm, PWM lead, pulse bass, dance groove |
-| `well3` | well 3 | the motif, fragmented and inverted | D phrygian (flat 2nd), 168 bpm, DPCM bass and kit, a tolling pedal |
+| `well1` | well 1 | the hook, in 5/4 | D minor, 138 bpm, 25% pulses, triangle bass, a heavy NES-kit rock beat |
+| `well2` | well 2 | the motif, sequenced | D phrygian (flat 2nd), 150 bpm, PWM lead, rimclicks and low toms, snare saved for the hook |
+| `well3` | well 3 | the hook, in 5/4, angry | D harmonic minor, 162 bpm, DPCM bass and kit in double time, claps |
 | `rest` | between wells | the motif's steps | F major (the relative), a 3/4 music box at 84 bpm, no drums |
 | `over` | game over (once) | the hook's fall | D harmonic minor, slow, slowing to a stop |
 | `win` | the run won (once) | the bounce | D major, 150 bpm, ends an octave up |

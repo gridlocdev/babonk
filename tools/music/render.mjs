@@ -102,10 +102,10 @@ async function main()
         const got = await win.webContents.executeJavaScript(`checkLength(${JSON.stringify(`/__music/${id}.mp3`)}, ${results[id].sampleRate})`);
         const shift = got.onset - results[id].onset, longer = got.frames - results[id].frames;
         log(`${id}: decodes ${got.frames} frames (${longer >= 0 ? '+' : ''}${longer}), first sound ${shift >= 0 ? '+' : ''}${shift} frames from where it was rendered`);
-        // a few frames either way is far below a millisecond; more means the decoder kept the encoder's delay (about
-        // 1105 frames). A one-shot that opens on a hard attack can smear a few hundred frames early (mp3 pre-echo),
-        // which moves no loop point, so it gets more room
-        if (Math.abs(shift) > (results[id].loop ? 8 : 400) || Math.abs(longer) > 64) throw new Error(`${id}.mp3 doesn't decode in step with its render; its loop points would drift`);
+        // a few frames is far below a millisecond. A decoder that kept the encoder's delay starts every sound about
+        // 1105 frames late, which would move every loop point. A hard first hit can sound a little early instead
+        // (mp3 pre-echo smears it ahead by up to a few hundred frames), which moves nothing
+        if (shift > 8 || shift < -400 || Math.abs(longer) > 64) throw new Error(`${id}.mp3 doesn't decode in step with its render; its loop points would drift`);
     }
     writeData(TRACKS, results);
 }
@@ -134,6 +134,7 @@ function writeData(TRACKS, fresh)
         all[t.id] = {
             file: `music/${t.id}.mp3`, title: info.title, tempo: info.tempo, beatsPerBar: info.beatsPerBar,
             offset: info.offset, end: info.end, seconds: +info.seconds.toFixed(4), frames: info.frames, rate: info.sampleRate ?? info.rate, loop: info.loop,
+            ...(info.bars && { bars: info.bars }),
             ...(t.layerOf && { layerOf: t.layerOf, place: t.place, level: t.level }),
         };
     }
@@ -142,7 +143,8 @@ function writeData(TRACKS, fresh)
 // Content only. Times are seconds into the file. offset is where the first beat falls, so beats sit at
 // offset + n * 60 / tempo, and end is where the last bar ends (a one-shot's reverb rings on after it). loop is the
 // part a looping track repeats, start and end on bar lines; null plays once. frames at rate is the file's exact
-// length, for checking a decoder trimmed the mp3's encoder delay. A layer (layerOf) plays in step with that track,
+// length, for checking a decoder trimmed the mp3's encoder delay. bars, when the meter changes, lists every bar line
+// (seconds into the file) up to the loop's end. A layer (layerOf) plays in step with that track,
 // up to its level, the nearer the player is to its place.
 export const TRACKS = ${body};
 `);
