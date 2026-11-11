@@ -47,7 +47,8 @@ body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; 
 .tab-key { font: 700 11px var(--ui); padding: 2px 5px; border: 1px solid #dcefe288; color: #dcefe2bb; }
 .col.settings { min-width: min(460px, 92vw); }
 .row { display: flex; align-items: center; gap: 16px; text-align: left; text-transform: none; touch-action: none; }
-.r-label { flex: 0 1 10.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-label { flex: 0 1 12em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row:not([role="slider"]) .r-label { flex: 1 1 auto; }     /* no bar to line up with: the label takes the room */
 .r-bar { flex: 1 1 120px; position: relative; min-width: 60px; height: 12px; border: 2px solid currentColor; }
 .r-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
 .r-val { flex: 0 0 3.6em; margin-left: auto; text-align: right; }
