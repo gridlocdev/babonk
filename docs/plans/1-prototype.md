@@ -18,9 +18,18 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 - [x] It follows the screens and changes on the bar; Music on/off in the pause menu, kept in the save.
 - [x] The wells darker (D minor, phrygian, harmonic minor) and in 5/4 and 3/4, with hand-written drums.
 
+## Done: settings and the mix
+
+- [x] Settings card with Master, Music and Effects sliders (keys and pad with hold-to-repeat, click or drag, touch), Reset to defaults, Back. From the pause menu, or the title (Esc, pad menu, the touch pause button).
+- [x] Volumes saved at once in `core`; old Sound/Music on/off saves carried over; bad values fall back to defaults.
+- [x] Effects brought down about 4 dB and music up about 4 dB, from 12 dB apart to about 4; a limiter on the output.
+- [x] Leaving the tab mid-run pauses it; audio resumes when the tab comes back.
+
 ## For you
 
-- [ ] Listen to the soundtrack (http://localhost:8141, click to start; the rest and game over: http://localhost:8141/?debug&shot=rest, http://localhost:8141/?debug&shot=over). Do the darker 5/4 and 3/4 wells fit the fall, and are the drums interesting enough now? Is it too loud against the effects (`LEVEL` in `audio/music.js`)? Each well's tempo and mode, and the hook, are in `tools/music/songs.js`.
+- [ ] Listen to the new mix (http://localhost:8141, play a well). Are the effects level with the music now, or should they sit higher or lower? Change `EFFECTS_LEVEL` in `audio/sfx.js` or `LEVEL` in `audio/music.js`, or just try the sliders (Esc on the title, http://localhost:8141/?debug&shot=settings).
+
+- [ ] Listen to the soundtrack (http://localhost:8141, click to start; the rest and game over: http://localhost:8141/?debug&shot=rest, http://localhost:8141/?debug&shot=over). Do the darker 5/4 and 3/4 wells fit the fall, and are the drums interesting enough now? Each well's tempo and mode, and the hook, are in `tools/music/songs.js`.
 - [ ] Do the loops wrap without a hitch? The wells loop about every 58–68 s; long wells will hear them twice. The title still uses the 4/4 hook; should it go 5/4 too?
 
 - [ ] Play it (http://localhost:8141, `just serve`). Does the bonk feel good: homing speed and time (`homeSpeed`, `homeTime`), dash (`dashSpeed`, `dashTime`), bounce heights (`bounceV`, `stompV`, `wallKickV`) in `features/babonk/babonk-data.js`? Only a bot has played it.
@@ -37,5 +46,5 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 ## Follow-ups
 
 - [ ] Babonk has 13 chunks. More, and a few per well with a new idea (moving blocks, crumbling ledges), would keep runs from repeating.
-- [ ] The pause button shows on the title on a touch screen, where it does nothing. Hide it there, or give it a use.
+- [ ] On the title, the touch pause button now opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] A home-screen icon and web manifest.

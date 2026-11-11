@@ -184,6 +184,12 @@ export function pressWord(padUsed)
     if (MOBILE) return 'TAP BONK';
     return padUsed ? 'PRESS A' : 'PRESS SPACE';
 }
+// how to open settings from the title; a touch screen has its button in the corner
+export function settingsWord(padUsed)
+{
+    if (MOBILE) return '';
+    return padUsed ? 'MENU: SETTINGS' : 'ESC: SETTINGS';
+}
 const blinkOn = ()=> Math.floor(clock * 2) % 2 === 0;
 
 function drawTitle(ui)
@@ -195,6 +201,7 @@ function drawTitle(ui)
     pixelCentre(g, 'bonk off foes, walls and floors', W / 2, 70, 10, BONE);
     if (blinkOn()) pixelCentre(g, ui.prompt, W / 2, 104, 10, ORANGE);
     pixelCentre(g, `HI ${ui.hi}`, W / 2, 126, 10, BONE);
+    if (ui.settingsWord) pixelCentre(g, ui.settingsWord, W / 2, 162, 10, BONE);
 }
 
 // draw a frame. ui: { screen: 'title' | 'play' | 'rest' | 'over' | 'zoo', prompt, hi, info,

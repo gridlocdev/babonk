@@ -1,4 +1,5 @@
 // The save. Each feature owns one slice; nothing else writes it.
+import { migrateVolumes } from '../lib/volume.js';
 import { storage } from '../platform/storage.js';
 
 const SAVE_KEY = 'babonk-save-v1';
@@ -29,5 +30,6 @@ export const state = {
 // move old save shapes into slices so existing players keep their progress
 function migrate(d)
 {
-    // e.g. if (d.oldField && !d.myFeature) { d.myFeature = { value: d.oldField }; delete d.oldField; }
+    // the Sound and Music on/off switches became volume sliders
+    migrateVolumes(d);
 }

@@ -1,24 +1,25 @@
 // Babonk: a pixel platformer down three wells. The rules are in sim.js, the picture in view.js; this file runs the
-// title, pause menu, sound, rests between wells and the high-score table.
+// title, pause menu, settings, rests between wells and the high-score table.
 import { FLAGS } from '../../platform/engine.js';
 import { input } from '../../platform/input.js';
 import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
 import { sfx } from '../../audio/sfx.js';
-import { music, setMusic, setMusicArea } from '../../audio/music.js';
+import { setMusicArea } from '../../audio/music.js';
 import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
 import { letterIn, spellOut } from '../../ui/kinetic.js';
-import { settings } from '../../ui/settings.js';
+import { showSettings } from '../../ui/settings-screen.js';
 import { touch } from '../../ui/touch.js';
 import { CONFIG, clearBonus } from './babonk-data.js';
 import { createRun, lockTarget, nextWell, step, wellCount } from './sim.js';
 import { SOUNDS } from './sounds-data.js';
 import { PALETTE } from './sprites-data.js';
-import { pressWord, render } from './view.js';
+import { pressWord, render, settingsWord } from './view.js';
 
 const STEP = 1 / 60;
 
-let mode = 'menu';      // menu (the title) | play | rest | paused | over | initials | zoo (debug)
+let mode = 'menu';      // menu (the title) | play | rest | paused | settings | over | initials | zoo (debug)
+let settingsFrom = 'menu';  // where settings goes back to: the title or the pause menu
 let modeTime = 0, acc = 0;
 let run = null, save = null, ctxState = null;
 let rest = { bonus: 0, healed: false }, result = { score: 0, best: false, won: false };
@@ -38,7 +39,7 @@ function startRun(seed = FLAGS.debug ? CONFIG.seed : (Math.random() * 2 ** 31) |
     setMode('play');
 }
 
-function showPause()
+function showPause(focus = 0)
 {
     setMode('paused');
     touch.show(false);
@@ -46,8 +47,7 @@ function showPause()
         <div class="banner" style="color:${PALETTE.O}"></div>
         <div class="col">
             <button class="btn" id="b-go">Resume</button>
-            <button class="btn" id="b-sound">Sound: ${settings.get('sound') ? 'on' : 'off'}</button>
-            <button class="btn" id="b-music">Music: ${music.on ? 'on' : 'off'}</button>
+            <button class="btn" id="b-settings">Settings</button>
             <button class="btn" id="b-menu">End the run</button>
         </div>
     `);
@@ -56,21 +56,26 @@ function showPause()
     const back = ()=> { sfx.play('uiMove'); cards.hide(); controls(); setMode('play'); };
     cards.menu([
         [{ el: root.querySelector('#b-go'), pick: back }],
-        [{ el: root.querySelector('#b-sound'), pick()
-        {
-            const on = settings.toggle('sound');
-            root.querySelector('#b-sound').textContent = `Sound: ${on ? 'on' : 'off'}`;
-            sfx.setEnabled(on);
-            sfx.play('uiPick');
-        } }],
-        [{ el: root.querySelector('#b-music'), pick()
-        {
-            setMusic(!music.on);
-            root.querySelector('#b-music').textContent = `Music: ${music.on ? 'on' : 'off'}`;
-            sfx.play('uiPick');
-        } }],
+        [{ el: root.querySelector('#b-settings'), pick: ()=> { sfx.play('uiPick'); openSettings('paused'); } }],
         [{ el: root.querySelector('#b-menu'), pick: ()=> { sfx.play('uiMove'); cards.hide(); controls(); setMode('menu'); } }],
-    ], { back, move: ()=> sfx.play('uiMove') });
+    ], { focus: [focus, 0], back, move: ()=> sfx.play('uiMove') });
+}
+
+// settings, from the title or the pause menu; Back returns there
+function openSettings(from)
+{
+    settingsFrom = from;
+    setMode('settings');
+    touch.show(false);
+    showSettings({
+        color: PALETTE.O,
+        sound: (what)=> sfx.play(what === 'move' ? 'uiMove' : what === 'pick' ? 'uiPick' : 'babonkStar'),
+        close()
+        {
+            if (settingsFrom === 'paused') { showPause(1); return; }
+            cards.hide(); controls(); setMode('menu');
+        },
+    });
 }
 
 function askInitials()
@@ -146,7 +151,7 @@ const pressed = ()=> input.holdPressed() || input.confirm();
 // wells, and a one-shot for the run's end (music/, from tools/music/songs.js)
 function musicFor()
 {
-    if (mode === 'play' || mode === 'paused') return `well${Math.min(run.well, 2) + 1}`;
+    if (mode === 'play' || mode === 'paused' || mode === 'settings' && settingsFrom === 'paused') return `well${Math.min(run.well, 2) + 1}`;
     if (mode === 'rest') return 'rest';
     if (mode === 'over' || mode === 'initials') return result.won ? 'win' : 'over';
     return 'title';
@@ -159,15 +164,19 @@ export default {
         ctxState = state;
         save = state.slice('babonk', { table: [], lastName: 'AAA' });
         for (const [name, def] of Object.entries(SOUNDS)) sfx.define('babonk' + name[0].toUpperCase() + name.slice(1), def);
-        if (!settings.get('sound')) sfx.setEnabled(false);
         run = createRun();
-        touch.onPause(()=> { if (mode === 'play') showPause(); });
+        // the pause button: the pause menu in play, settings on the title
+        touch.onPause(()=> { if (mode === 'play') showPause(); else if (mode === 'menu') openSettings('menu'); });
+        // leaving the tab mid-run pauses it, so the run doesn't go on unseen
+        document.addEventListener('visibilitychange', ()=> { if (document.hidden && mode === 'play') showPause(); });
         controls();
         setMusicArea(musicFor);
 
         const start = FLAGS.debug ? FLAGS.params.get('shot') : null;
         if (start === 'zoo') { touch.show(false); setMode('zoo'); }
-        else if (['play', 'bot', 'rest', 'over'].includes(start)) startRun();
+        else if (['play', 'bot', 'rest', 'over', 'pause'].includes(start)) startRun();
+        if (start === 'pause') showPause();
+        if (start === 'settings') openSettings('menu');
         if (start === 'bot') bot = { dir: 1, turned: 0 };
         if (start === 'rest') { run.state = 'clear'; rest = { bonus: clearBonus(run.hp), healed: false }; setMode('rest'); }
         if (start === 'over') { run.score = 3170; finish(false); }
@@ -176,11 +185,12 @@ export default {
     {
         modeTime += dt;
         if (mode === 'zoo') return;
-        if (mode === 'paused' || mode === 'initials') { cards.update(); return; }
+        if (mode === 'paused' || mode === 'settings' || mode === 'initials') { cards.update(); return; }
         if (mode === 'menu')
         {
             if (modeTime < .2) return;
-            if (pressed()) startRun();
+            if (input.pause()) openSettings('menu');
+            else if (pressed()) startRun();
             return;
         }
         if (mode === 'play') { playStep(dt); return; }
@@ -199,7 +209,7 @@ export default {
     {
         const word = pressWord(input.hasPad), hi = topScore(save.table);
         let ui;
-        if (mode === 'menu') ui = { screen: 'title', prompt: word, hi };
+        if (mode === 'menu' || mode === 'settings' && settingsFrom === 'menu') ui = { screen: 'title', prompt: word, hi, settingsWord: settingsWord(input.hasPad) };
         else if (mode === 'rest') ui = { screen: 'rest', prompt: modeTime > .8 ? word : '', info: rest, hi };
         else if (mode === 'over' || mode === 'initials') ui = { screen: 'over', prompt: mode === 'over' && modeTime > 1.2 ? word : '', info: result, hi: Math.max(hi, result.score) };
         else if (mode === 'zoo') ui = { screen: 'zoo', t: ZOO_T };

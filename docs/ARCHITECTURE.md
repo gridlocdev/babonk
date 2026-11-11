@@ -7,11 +7,11 @@ Babonk is plain ES modules with no bundler and no runtime dependencies. The game
 ```
 src/
   lib/        pure helpers: seeded rng, sound synthesis, pixel-font (the bitmap font), high-scores (the top-ten table),
-              anim (sprite-frame timing)
+              anim (sprite-frame timing), volume (the sliders' steps, gains and save cleanup)
   platform/   engine.js (the canvas and its whole-number scaling, URL FLAGS, MOBILE, the fixed-step loop), input, storage
-  game/       events (pub/sub), state (the save), loop (the system list)
+  game/       events (pub/sub), state (the save), loop (the system list), settings (the player's settings, `core` slice)
   ui/         cards (the pause menu's buttons), initials (the three-letter entry), kinetic (banner letters), touch
-              controls, settings, pixel-text (lib/pixel-font.js on a 2D canvas), style.css
+              controls, settings-screen (the volume sliders card), pixel-text (lib/pixel-font.js on a 2D canvas), style.css
   audio/      sfx.js (Web Audio: sounds baked from code), sfx-defs.js (the menu sounds), music.js (the soundtrack),
               tracks-data.js (generated: each track's file, tempo and loop points)
   features/
@@ -49,15 +49,15 @@ tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the
 
 `view.js` draws the 320 × 180 screen each frame: sprites from `sprites-data.js` baked once, the well, effects, HUD in the pixel font. Sprites are strings of palette letters in `sprites-data.js`; `ANIMS` strings them into animations, each frame held for its own time (`frameAt` in `lib/anim.js`). The kill's `pop` effect carries the foe's frame and place, so the view draws it in mint for the hit stop before it bursts. `blockAt(tx, ty)` picks each block's variant from a hash of its tile. `pose.js` picks the hero's animation from the player and the run clock, using the times the sim records (`landAt`, `bounceAt`, `hurtAt`, `dash.t`). The zoo (`zoo.js`, `?debug&shot=zoo`) plays every animation at 3×, lays out every frame at play size and puts the cast on a ledge; add a sprite or animation to the data and it appears there. Check every new sprite in it, with the gray and silhouette views, before it goes into a well.
 
-`index.js` runs the screens: the title (where the page opens) → play → rest between wells → game over → initials when the score makes the top ten → the title. The pause menu (Resume, Sound, End the run) and the initials are HTML cards from `ui/cards.js` over the canvas, in the game's colours; everything else is drawn on the canvas.
+`index.js` runs the screens: the title (where the page opens) → play → rest between wells → game over → initials when the score makes the top ten → the title. The pause menu (Resume, Settings, End the run), Settings and the initials are HTML cards from `ui/cards.js` over the canvas, in the game's colours; everything else is drawn on the canvas. A card item with `adjust` is a slider: left and right change it and repeat while held. Settings opens from the pause menu, or from the title with Esc, the pad's menu button or the touch pause button; Back returns to where it came from. Leaving the tab mid-run pauses it.
 
-Its sounds are `lib/synth.js` code in `sounds-data.js`, registered with `sfx.define` as `babonk` + name; the menu sounds `uiMove` and `uiPick` are in `audio/sfx-defs.js`. The top ten and the last initials are the `babonk` save slice; the sound setting is the `core` slice. The save is one JSON string under the storage key `babonk-save-v1`.
+Its sounds are `lib/synth.js` code in `sounds-data.js`, registered with `sfx.define` as `babonk` + name; the menu sounds `uiMove` and `uiPick` are in `audio/sfx-defs.js`. The top ten and the last initials are the `babonk` save slice; the volumes are the `core` slice (`game/settings.js`); `migrateVolumes` turns old Sound and Music on/off saves into slider steps. The save is one JSON string under the storage key `babonk-save-v1`.
 
 ## Music
 
 The soundtrack is chiptune written as song specs for music-generator (`tools/music/songs.js`; the direction is `docs/AUDIO.md`). `just music` composes and renders them with music-generator's own code in a hidden Electron window (it needs a checkout at `../../apps/music-generator`, or `just music <path> [ids]`, and ffmpeg), writes `music/<id>.mp3` and the generated `audio/tracks-data.js`, and checks every mp3 decodes in step with its render. A looping track keeps one tempo to its loop's end (`push: 0`). A section may change the meter (the wells go between 5/4 and 3/4); such a track lists its bar lines in `tracks-data.js` (`bars`), and `music.js` changes tracks on those. A spec's `shape(score)` edits the composed notes before they play; the wells' drums are written that way.
 
-`audio/music.js` plays on the effects' context (`sfx.context`, through `sfx.musicOut`, after their compressor), so it starts with the first key or tap and never with `?mute`. The area function decides the track; a change waits for the next bar line and crossfades. Babonk sets it with `setMusicArea(musicFor)`: the title, a track per well, the rest, and one-shots for game over and the win. The on/off setting is the `music` save slice; Sound off suspends everything.
+`audio/music.js` plays on the effects' context (`sfx.context`, through `sfx.musicOut`, after their compressor), so it starts with the first key or tap and never with `?mute`. The area function decides the track; a change waits for the next bar line and crossfades. Babonk sets it with `setMusicArea(musicFor)`: the title, a track per well, the rest, and one-shots for game over and the win. Its volume is the Music slider. The mix: effects → their bus → a compressor, joined by the music after it → the Master gain → a limiter; the levels that balance the two are in `docs/AUDIO.md`.
 
 ## Debug flags
 
@@ -67,6 +67,7 @@ Add to the URL. `?debug` is needed for `shot`, `view`, `t` and `speed`.
 |---|---|
 | `?debug` | readout, `window.game`, a fixed seed, keys: 1 slow motion, 2 fast forward |
 | `?shot=play`, `bot`, `rest`, `over` | a run, a run played by a simple pilot, the rest between wells, the game over |
+| `?shot=pause`, `settings` | the pause menu over a run; settings over the title |
 | `?shot=zoo` | the sprite zoo: every animation, every frame, the cast at play size |
 | `&view=gray`, `&view=silhouette` | on any screen: check whether values separate, and whether every sprite reads by its outline |
 | `&t=<seconds>` | with `shot=zoo`: freeze its clock, for stills of one frame |

@@ -10,7 +10,7 @@
 A narrow well in three colours: blue-black void, mint brick walls and ledges, mid green for foes, spikes, stars and HP. Small, fast, jumpy: the hero bounces off foes and walls as it falls. Close quarters, so the music is dry and up front, not roomy.
 
 - **Music**: fast and rhythmic, pulses and triangle, dark and uneasy; it keeps up with the fall and never lets the beat settle.
-- **Effects** (`features/babonk/sounds-data.js`): bricks are hard and dry; foes pop; stars chime. They sit over the music (music bus at half level, after the effects' compressor).
+- **Effects** (`features/babonk/sounds-data.js`): bricks are hard and dry; foes pop; stars chime. They sit a few dB over the music, not on top of it. Measured: the tracks average about -20.5 dB and the effects about -14 dB over their loudest 50 ms, so the bus levels (`EFFECTS_LEVEL` in `audio/sfx.js`, `LEVEL` in `audio/music.js`) put the effects about 4 dB above the music at equal slider steps. The player sets Master, Music and Effects in Settings (3 dB a step; defaults 10, 8, 8).
 - **Ambience**: none. The music is the bed; the screen is never silent while it plays.
 
 ## The tracks

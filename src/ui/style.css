@@ -36,3 +36,16 @@ body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; 
 #tPause { right: calc(12px + env(safe-area-inset-right, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); width: 44px; height: 44px; background: #0b0f1eb0; border: 2px solid #dcefe299; font: 700 14px var(--ui) !important; }
 
 #debug { position: fixed; z-index: 70; pointer-events: none; bottom: 8px; left: 8px; padding: 2px 6px; font: 12px ui-monospace, Menlo, monospace; color: #8f8; background: rgba(0, 0, 0, .8); white-space: pre; }
+
+/* ---- settings: a volume slider is a row of label, bar and value; a drag along the bar sets it */
+.col.settings { min-width: min(420px, 92vw); }
+.slider { display: flex; align-items: center; gap: 20px; text-align: left; touch-action: none; }
+.s-label { flex: 0 0 5.6em; }
+.s-track { flex: 1; position: relative; min-width: 80px; height: 14px; border: 2px solid currentColor; }
+.s-track i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
+.s-num { flex: 0 0 3.2ch; text-align: right; }
+.slider.off .s-num { opacity: .7; }
+/* the focused slider shows that left and right move it; the gap leaves room, so focus never shifts the bar */
+.slider.focus .s-track::before, .slider.focus .s-track::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11px; }
+.slider.focus .s-track::before { content: '◀'; left: -14px; }
+.slider.focus .s-track::after { content: '▶'; right: -14px; }

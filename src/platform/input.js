@@ -77,6 +77,20 @@ export const input = {
         }
         return '';
     },
+    // the direction held right now, for a menu that repeats while held (a slider): 'left' 'right' 'up' 'down' or ''
+    navHeld()
+    {
+        if (any('ArrowLeft', 'KeyA') || padDown.has(14)) return 'left';
+        if (any('ArrowRight', 'KeyD') || padDown.has(15)) return 'right';
+        if (any('ArrowUp', 'KeyW') || padDown.has(12)) return 'up';
+        if (any('ArrowDown', 'KeyS') || padDown.has(13)) return 'down';
+        if (pad)
+        {
+            const gx = pad.axes[0] ?? 0, gy = pad.axes[1] ?? 0;
+            return gx < -.6 ? 'left' : gx > .6 ? 'right' : gy < -.6 ? 'up' : gy > .6 ? 'down' : '';
+        }
+        return '';
+    },
     // a connected pad decides the prompts
     get hasPad() { return !!pad; },
 };
