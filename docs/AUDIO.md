@@ -9,7 +9,7 @@
 
 A narrow well in three colours: blue-black void, mint brick walls and ledges, mid green for foes, spikes, stars and HP. Small, fast, jumpy: the hero bounces off foes and walls as it falls. Close quarters, so the music is dry and up front, not roomy.
 
-- **Music**: fast and rhythmic, pulses and triangle, minor but never gloomy; it keeps up with the fall.
+- **Music**: fast and rhythmic, pulses and triangle, dark and uneasy; it keeps up with the fall and never lets the beat settle.
 - **Effects** (`features/babonk/sounds-data.js`): bricks are hard and dry; foes pop; stars chime. They sit over the music (music bus at half level, after the effects' compressor).
 - **Ambience**: none. The music is the bed; the screen is never silent while it plays.
 
