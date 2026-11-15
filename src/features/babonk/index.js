@@ -195,7 +195,8 @@ export default {
         document.addEventListener('visibilitychange', ()=> { if (document.hidden && mode === 'play') showPause(); });
         controls();
         setMusicArea(musicFor);
-        musicCutIn('over');     // losing interrupts the well's music at once, no wait for the bar
+        musicCutIn('over');     // the run's end interrupts the well's music at once, no wait for the bar
+        musicCutIn('win');
 
         const start = FLAGS.debug ? FLAGS.params.get('shot') : null;
         if (start === 'zoo') { touch.show(false); setMode('zoo'); }

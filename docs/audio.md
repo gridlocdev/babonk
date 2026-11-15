@@ -36,4 +36,4 @@ One home key (D), one motif (the hook's first bar, `1:0.5 5:0.5 8 7:0.5 5:0.5 3`
 | Rest | relief | `rest` | go on: the next well |
 | Game over / won | loss / triumph | `over` / `win` once, then quiet | back to the title |
 
-The screen's mode picks the track (`musicFor` in `features/babonk/index.js`); `audio/music.js` changes on the next bar line, except game over, which cuts the well's music off and plays at once (`musicCutIn`). Pause has Music on/off apart from Sound, which mutes everything.
+The screen's mode picks the track (`musicFor` in `features/babonk/index.js`); `audio/music.js` changes on the next bar line, except game over and the win, which cut the well's music off and play at once (`musicCutIn`). Pause has Music on/off apart from Sound, which mutes everything.
