@@ -64,6 +64,10 @@ music path=music_generator *tracks:
     @[ -d node_modules/electron ] || npm install
     npx electron tools/music/render.mjs {{path}} {{tracks}}
 
-# run the unit tests for lib/, *-data.js and the rules
+# draw the home-screen icons in icons/ from the hero's sprite
+icons:
+    node tools/icons.mjs
+
+# run the tests: lib/, *-data.js, the world and hero, and each feature through its contract
 test:
     node --test

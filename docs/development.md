@@ -14,6 +14,7 @@ just lan        # serve the game to your Wi-Fi, to try it on a phone
 just check      # syntax-check every module, check the layer rules and type-check against jsconfig.json
 just test       # run the unit tests
 just dead       # list modules, exports and assets nothing uses (it only reports)
+just icons      # draw the home-screen icons in icons/ from the hero sprite
 just install    # install the pinned devDependencies (Playwright, Electron)
 just install-bench  # install Playwright and its Firefox build, about 100 MB, once per Playwright version
 just bench <runs>   # time frames in Playwright's Firefox, headless and muted
@@ -55,4 +56,4 @@ just music ~/src/apps/music-generator well1 rest   # render two tracks
 
 ## Deploying
 
-The game is deployed to [gridloc.dev/games/babonk](https://gridloc.dev/games/babonk/) as static files: `index.html`, `src/` and `music/`. A release is a `vX.Y.Z` tag on GitHub, with the version in `package.json`.
+The game is deployed to [gridloc.dev/games/babonk](https://gridloc.dev/games/babonk/) as static files: `index.html`, `manifest.json`, `icons/`, `src/` and `music/`. Without `manifest.json` and `icons/`, a phone's Add to Home Screen shows a letter instead of the icon; after a deploy, check that `/icons/apple-touch-icon.png` loads and `/manifest.json` comes as `application/json`. A release is a `vX.Y.Z` tag on GitHub, with the version in `package.json`.
