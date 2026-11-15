@@ -4,7 +4,9 @@
 // The area decides what plays (setMusicArea; 'main' until something sets it) unless something has asked for a cue:
 // a cutscene, a minigame, the ending. The newest unreleased cue wins. A change waits for the playing track's next
 // bar line (or beat, when bars are long), starts the new track there and lets the old one fade out across about a
-// bar, so the music turns a corner instead of cutting. A one-shot cue that plays to its end hands back to the area.
+// bar, so the music turns a corner instead of cutting. A track marked with musicCutIn (a game over sting) doesn't
+// wait: it stops whatever is playing and starts at once, and is kept decoded so it never waits to load either.
+// A one-shot cue that plays to its end hands back to the area.
 //
 // A track can have layers (a pond, a cabin, a shrine, each adding its own instruments). Each is a short loop that fits
 // its track's loop a whole number of times; near its place (audio/places.js) it is started in step with the track and
@@ -26,6 +28,7 @@ const SLIDE = .05;          // seconds (time constant) for a slider change to se
 const MAX_WAIT = 2.5;       // seconds; when a bar is longer than this, a change waits for the next beat instead
 const FADE = [1.2, 3];      // seconds; an old track fades out over a bar, kept inside these
 const ONE_SHOT_IN = .3;     // seconds; a one-shot comes in quickly, it was written to start
+const CUT = .02;            // seconds; a cut-in track's attack, and how fast it silences the old one (no click)
 const LEAD = .06;           // seconds of scheduling headroom
 const KEEP_DECODED = MOBILE ? 1 : 3;     // decoded tracks kept (a long one is about 60 MB; a phone may reload the tab); layers apart
 const SWELL = 1.5;          // seconds (time constant) for a layer to follow the player's distance
@@ -46,6 +49,18 @@ export const setMusicDuck = (v)=> { duck = v; };
 let current = null;         // { id, track, src, gain, when, at, shift, cue, layers }: the source starts at `when`, its first beat is `at`
 const fading = [];          // tracks on their way out
 const cues = [];
+const cutIn = new Set();    // tracks that interrupt instead of waiting for a downbeat
+
+/**
+ * Marks a track to cut in: the moment it is wanted it stops the playing track and starts, with no wait for a bar line
+ * and no crossfade. It is decoded as soon as the music starts and kept, so it can start the same frame.
+ * @param {string} id a track id in tracks-data.js
+ */
+export function musicCutIn(id)
+{
+    cutIn.add(id);
+    if (bus) load(id);
+}
 
 /**
  * Asks for a cue's track (a track id in tracks-data.js) until released. The newest unreleased cue wins; a cue whose
@@ -87,7 +102,7 @@ function load(id)
             into.set(id, { buf, shift });
             if (into === layerBufs) return;
             for (const old of [...ready.keys()])
-                if (ready.size > KEEP_DECODED && old !== id && old !== current?.id && !fading.some((f)=> f.id === old)) ready.delete(old);
+                if (ready.size > KEEP_DECODED + cutIn.size && old !== id && old !== current?.id && !cutIn.has(old) && !fading.some((f)=> f.id === old)) ready.delete(old);
         });
 }
 function use(id)
@@ -137,7 +152,7 @@ function startTrack(id, at, cue)
     // the file's first beat lands on `at`, when there is time to start it a hair early
     const when = Math.max(ctx.currentTime + .01, at - t.offset - shift);
     src.start(when);
-    const fadeIn = t.loop ? clampFade(spb(t) * t.beatsPerBar) : ONE_SHOT_IN;
+    const fadeIn = cutIn.has(id) ? CUT : t.loop ? clampFade(spb(t) * t.beatsPerBar) : ONE_SHOT_IN;
     curve(gain.gain, 0, 1, when, fadeIn);
     return { id, track: t, src, gain, when, at, shift, cue, layers: new Map() };
 }
@@ -222,6 +237,13 @@ function wanted()
 function change(id, cue)
 {
     const now = audioContext.currentTime;
+    // a cut-in silences everything now, whatever was playing or waiting, and starts at once
+    if (cutIn.has(id))
+    {
+        if (current) fadeOut(current, now, CUT);
+        current = startTrack(id, now + .005, cue);
+        return;
+    }
     // a change still waiting for its downbeat is changed again: the same downbeat, or back to what was playing
     if (current && current.at > now + .005)
     {
@@ -295,6 +317,7 @@ export function musicStart()
         music.started = true;
         settleUntil = audioContext.currentTime + .5;
         load(area());
+        for (const id of cutIn) load(id);
     }
     catch (e) { bus = null; }
 }

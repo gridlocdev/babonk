@@ -4,7 +4,7 @@ import { FLAGS } from '../../platform/engine.js';
 import { input } from '../../platform/input.js';
 import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
 import { sfx } from '../../audio/sfx.js';
-import { setMusicArea, setMusicDuck } from '../../audio/music.js';
+import { musicCutIn, setMusicArea, setMusicDuck } from '../../audio/music.js';
 import { setting } from '../../game/settings.js';
 import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
@@ -195,6 +195,7 @@ export default {
         document.addEventListener('visibilitychange', ()=> { if (document.hidden && mode === 'play') showPause(); });
         controls();
         setMusicArea(musicFor);
+        musicCutIn('over');     // losing interrupts the well's music at once, no wait for the bar
 
         const start = FLAGS.debug ? FLAGS.params.get('shot') : null;
         if (start === 'zoo') { touch.show(false); setMode('zoo'); }
