@@ -15,7 +15,7 @@ src/
   player/     hero.js (movement, jump, the bonk, hurt), hero-data.js (its numbers), pose.js (which animation it shows)
   render/     screen.js (the canvas, baked sprites), sprites-data.js, view.js (the well, effects, HUD, title and panels),
               zoo.js (the debug sprite zoo and check views)
-  ui/         cards (the pause menu's buttons), initials (the three-letter entry), kinetic (banner letters), touch
+  ui/         pixel-menu (menus drawn in the pixel font: pause, initials), menu-nav (focus moved by keys and pad), cards (the HTML settings screen), touch
               controls, settings-screen (tabs of setting rows), fps (the frame-rate readout), pixel-text (lib/pixel-font.js on a 2D canvas), style.css
   audio/      sfx.js (Web Audio: sounds baked from code), sfx-defs.js (every sound), music.js (the soundtrack),
               tracks-data.js (generated: each track's file, tempo and loop points)
@@ -65,7 +65,7 @@ Read this when changing the rules, a foe, the stars, the chain or the screens.
 
 `render/view.js` draws the 320 × 180 screen each frame: the well's tiles, then what features draw with `addRunLayer(z, draw)` (stars, then foes), then hit flashes, the lock bracket, afterimages and the hero, then effects and the HUD in the pixel font. Sprites are strings of palette letters in `render/sprites-data.js`, baked once in `render/screen.js`; `ANIMS` strings them into animations, each frame held for its own time (`frameAt` in `lib/anim.js`). The kill's `pop` effect carries the foe's frame and place, so the view draws it in mint for the hit stop before it bursts. `blockAt(tx, ty)` picks each block's variant from a hash of its tile. The zoo (`render/zoo.js`, `?debug&shot=zoo`) plays every animation at 3×, lays out every frame at play size and puts the cast on a ledge; add a sprite or animation to the data and it appears there. Check every new sprite in it, with the gray and silhouette views, before it goes into a well.
 
-`features/run` runs the screens: the title (where the page opens) → play → rest between wells → game over → initials when the score makes the top ten → the title. The pause menu (Continue, Settings, Restart, Quit to title, the last two confirmed), Settings and the initials are HTML cards from `ui/cards.js` over the canvas, in the game's colours; everything else is drawn on the canvas. A card item with `adjust` is a slider: left and right change it and repeat while held; a menu's `tick` takes its own keys first (the settings tabs). Settings and the pause menu follow `docs/settings.md`. Leaving the tab mid-run pauses it.
+`features/run` runs the screens: the title (where the page opens) → play → rest between wells → game over → initials when the score makes the top ten → the title. The pause menu (Continue, Settings, Restart, Quit to title, the last two confirmed) and the initials are drawn on the canvas in the pixel font by `ui/pixel-menu.js`: items are boxes in screen pixels, and a mouse or finger on one focuses and picks it. Settings is HTML cards from `ui/cards.js` over the canvas, in the game's colours. Both move their focus with `ui/menu-nav.js`: an item with `adjust` is a slider, so left and right change it and repeat while held, and a menu's `tick` takes its own keys first (the settings tabs). Settings and the pause menu follow `docs/settings.md`. Leaving the tab mid-run pauses it.
 
 Every sound is `lib/synth.js` code in `audio/sfx-defs.js`; the run plays what its parts queue in `w.sfx` by name. The top ten and the last initials are the `run` save slice (older saves' `babonk` slice is moved there); the settings are the `core` slice (`game/settings.js`, only what differs from the defaults); `game/state.js` carries older saves' Sound and Music switches and volume steps into it. The save is one JSON string under the storage key `babonk-save-v1`.
 
@@ -93,7 +93,7 @@ Add to the URL. `?debug` is needed for `shot`, `view`, `t` and `speed`.
 |---|---|
 | `?debug` | readout, `window.game`, a fixed seed, keys: 1 slow motion, 2 fast forward |
 | `?shot=play`, `bot`, `rest`, `over` | a run, a run played by a simple pilot, the rest between wells, the game over |
-| `?shot=pause`, `settings` | the pause menu over a run; settings over the title |
+| `?shot=pause`, `settings`, `initials` | the pause menu over a run; settings over the title; the initials after a 3170 game over |
 | `?shot=zoo` or `?room=zoo` | the sprite zoo: every animation, every frame, the cast at play size |
 | `?room=gym`, `&case=<row>` | the gym, at a row: `jump`, `gap`, `dash`, `lock`, `kill` |
 | `?room=museum`, `&exhibit=<id>` | the museum, at an exhibit: `wallkick`, `sealed`, `tell`, `hitstop`, `chain`, `stars` |

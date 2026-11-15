@@ -8,7 +8,8 @@ import { musicCutIn, setMusicArea, setMusicDuck } from '../../audio/music.js';
 import { setting } from '../../game/settings.js';
 import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
-import { letterIn, spellOut } from '../../ui/kinetic.js';
+import { banner, button, dim, look, panel, pixelMenu } from '../../ui/pixel-menu.js';
+import { pixelCentre } from '../../ui/pixel-text.js';
 import { showSettings } from '../../ui/settings-screen.js';
 import { touch } from '../../ui/touch.js';
 import { addRunPart, createRun, nextWell, runParts, say, step, wellCount } from '../../world/run.js';
@@ -16,6 +17,7 @@ import { TILE } from '../../world/wells-data.js';
 import { hero, lockTarget } from '../../player/hero.js';
 import { HERO } from '../../player/hero-data.js';
 import { PALETTE } from '../../render/sprites-data.js';
+import { g } from '../../render/screen.js';
 import { pressWord, render, settingsWord } from '../../render/view.js';
 import { RUN, clearBonus } from './run-data.js';
 
@@ -43,47 +45,43 @@ function startRun(seed = FLAGS.debug ? RUN.seed : (Math.random() * 2 ** 31) | 0)
     setMode('play');
 }
 
+// the pause menu and its questions, drawn on the screen over the frozen well
+const BOX = { x: 88, y: 30, w: 144, h: 116 };
+const item = (y, w = 112, x = 160 - w / 2)=> ({ x, y, w, h: 14 });
+
 function showPause(focus = 0)
 {
     setMode('paused');
     touch.show(false);
-    cards.show(`
-        <div class="banner" style="color:${PALETTE.O}"></div>
-        <div class="col">
-            <button class="btn" id="b-go">Continue</button>
-            <button class="btn" id="b-settings">Settings</button>
-            <button class="btn" id="b-restart">Restart</button>
-            <button class="btn" id="b-menu">Quit to title</button>
-        </div>
-    `);
-    const root = cards.root;
-    letterIn(spellOut(root.querySelector('.banner'), 'PAUSED'), { stagger: 28, dur: 300 });
-    const back = ()=> { sfx.play('uiMove'); cards.hide(); controls(); setMode('play'); };
-    cards.menu([
-        [{ el: root.querySelector('#b-go'), pick: back }],
-        [{ el: root.querySelector('#b-settings'), pick: ()=> { sfx.play('uiPick'); openSettings('paused'); } }],
-        [{ el: root.querySelector('#b-restart'), pick: ()=> confirm('Restart the run?', 2, ()=> { cards.hide(); controls(); startRun(); }) }],
-        [{ el: root.querySelector('#b-menu'), pick: ()=> confirm('Quit to the title? This run will end.', 3, ()=> { cards.hide(); controls(); setMode('menu'); }) }],
-    ], { focus: [focus, 0], back, move: ()=> sfx.play('uiMove') });
+    const back = ()=> { sfx.play('uiMove'); pixelMenu.hide(); controls(); setMode('play'); };
+    const items = [
+        { ...item(66), label: 'CONTINUE', pick: back },
+        { ...item(84), label: 'SETTINGS', pick: ()=> { sfx.play('uiPick'); pixelMenu.hide(); openSettings('paused'); } },
+        { ...item(102), label: 'RESTART', pick: ()=> confirm(['Restart the run?'], 2, ()=> { controls(); startRun(); }) },
+        { ...item(120), label: 'QUIT TO TITLE', pick: ()=> confirm(['Quit to the title?', 'This run will end.'], 3, ()=> { controls(); setMode('menu'); }) },
+    ];
+    pixelMenu.show(items.map((it)=> [it]), (g, t)=>
+    {
+        dim(g);
+        panel(g, BOX.x, BOX.y, BOX.w, BOX.h);
+        banner(g, 'PAUSED', 160, 38, 20, t);
+        for (const it of items) button(g, it, it.label, pixelMenu.focus === it);
+    }, { focus: [focus, 0], back, move: ()=> sfx.play('uiMove') });
 }
 
 // Restart and Quit lose the run, so each asks first; No is focused, and No or Back returns to the pause menu
-function confirm(question, from, yes)
+function confirm(lines, from, yes)
 {
     sfx.play('uiMove');
-    cards.show(`
-        <div class="ask">${question}</div>
-        <div class="row-btns">
-            <button class="btn" id="b-no">No</button>
-            <button class="btn" id="b-yes">Yes</button>
-        </div>
-    `);
-    const root = cards.root;
-    const no = ()=> { sfx.play('uiMove'); showPause(from); };
-    cards.menu([[
-        { el: root.querySelector('#b-no'), pick: no },
-        { el: root.querySelector('#b-yes'), pick: ()=> { sfx.play('uiPick'); yes(); } },
-    ]], { back: no, move: ()=> sfx.play('uiMove') });
+    const no = { ...item(108, 52, 102), label: 'NO', pick: ()=> { sfx.play('uiMove'); showPause(from); } };
+    const ok = { ...item(108, 52, 166), label: 'YES', pick: ()=> { sfx.play('uiPick'); pixelMenu.hide(); yes(); } };
+    pixelMenu.show([[no, ok]], (g)=>
+    {
+        dim(g);
+        panel(g, BOX.x, BOX.y, BOX.w, BOX.h);
+        lines.forEach((line, i)=> pixelCentre(g, line, 160, 60 + i * 14, 10, look.ink));
+        for (const it of [no, ok]) button(g, it, it.label, pixelMenu.focus === it);
+    }, { back: no.pick, move: ()=> sfx.play('uiMove') });
 }
 
 // settings, from the title or the pause menu; Back returns there
@@ -97,8 +95,9 @@ function openSettings(from)
         sound: (what)=> sfx.play(what === 'move' ? 'uiMove' : what === 'pick' ? 'uiPick' : 'star'),
         close()
         {
+            cards.hide();
             if (settingsFrom === 'paused') { showPause(1); return; }
-            cards.hide(); controls(); setMode('menu');
+            controls(); setMode('menu');
         },
     });
 }
@@ -199,6 +198,7 @@ export default {
     build({ state })
     {
         ctxState = state;
+        Object.assign(look, { ink: PALETTE.W, accent: PALETTE.O, ground: PALETTE.K });
         save = state.slice('run', { table: [], lastName: 'AAA' });
         addRunPart(floor);
         run = createRun(RUN.seed, [hero, ...runParts]);
@@ -215,18 +215,20 @@ export default {
         // the gym and museum (src/dev/rooms.js) run instead of the run
         if (room === 'gym' || room === 'museum') setMode('room');
         if (start === 'zoo' || room === 'zoo') { touch.show(false); setMode('zoo'); }
-        else if (['play', 'bot', 'rest', 'over', 'pause'].includes(start)) startRun();
+        else if (['play', 'bot', 'rest', 'over', 'pause', 'initials'].includes(start)) startRun();
         if (start === 'pause') showPause();
         if (start === 'settings') openSettings('menu');
         if (start === 'bot') bot = { dir: 1, turned: 0 };
         if (start === 'rest') { run.state = 'clear'; rest = { bonus: clearBonus(run.hp), healed: false }; setMode('rest'); }
-        if (start === 'over') { run.score = 3170; finish(false); }
+        if (start === 'over' || start === 'initials') { run.score = 3170; finish(false); }
+        if (start === 'initials') askInitials();
     },
     update(dt)
     {
         modeTime += dt;
         if (mode === 'zoo' || mode === 'room') return;
-        if (mode === 'paused' || mode === 'settings' || mode === 'initials') { cards.update(); return; }
+        if (mode === 'paused' || mode === 'initials') { pixelMenu.update(); return; }
+        if (mode === 'settings') { cards.update(); return; }
         if (mode === 'menu')
         {
             if (modeTime < .2) return;
@@ -257,6 +259,7 @@ export default {
         else if (mode === 'zoo') ui = { screen: 'zoo', t: ZOO_T };
         else ui = { screen: 'play', hi };
         render(run, { ...ui, view: VIEW }, dt);
+        pixelMenu.draw(g, dt);
     },
     debug() { return { mode, well: run?.well, t: +(run?.t ?? 0).toFixed(1), score: run?.score, hp: run?.hp, chain: run?.chain, y: Math.round(run?.player.y ?? 0) }; },
 };

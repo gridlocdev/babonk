@@ -68,6 +68,23 @@ test('on the title the touch button starts a run, which goes on until Escape pau
     assert.equal(run.debug().t, t);
 });
 
+test('the pause menu moves with keys: Restart asks first, No goes back, Yes starts a new run', ()=>
+{
+    assert.equal(run.debug().mode, 'paused');
+    frame(()=> key('ArrowDown'));
+    frame(()=> key('ArrowDown'));
+    frame(()=> key('Enter'));
+    // the question: No is focused, so confirming goes back to the pause menu, on Restart
+    frame(()=> key('Enter'));
+    assert.equal(run.debug().mode, 'paused');
+    const t = run.debug().t;
+    frame(()=> key('Enter'));
+    frame(()=> key('ArrowRight'));
+    frame(()=> key('Enter'));
+    assert.equal(run.debug().mode, 'play');
+    assert.ok(run.debug().t < t);
+});
+
 test('landing on a well\'s floor clears it and pays for the hp left', ()=>
 {
     const w = createRun(RUN.seed, [hero, ...runParts]);

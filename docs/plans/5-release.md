@@ -4,11 +4,11 @@
 
 Babonk 1.0 is out (v1.0.0, then fixes in v1.0.1 and v1.0.2) and live on gridloc.dev. This stage is the bug fixes, balance, performance and final touches after it. Since 1.0, the code has been split into world, player and render layers with one folder per feature, each feature is tested through its contract, the graphics have quality presets with a frame-rate watchdog, the game installs to a home screen, and there is a gym and a museum beside the zoo (`docs/ARCHITECTURE.md#dev-rooms`). None of that changed how the game plays, looks or sounds; `just rooms` and the tests check it.
 
-Next: the pause menu in the pixel font (Slices), the play-tests below, then whatever they turn up.
+Next: the play-tests below, then whatever they turn up.
 
 ## For you
 
-- To play: 8 play-tests, under To play
+- To play: 9 play-tests, under To play
 - To hear: 4, under To hear
 
 ### Not yet checked
@@ -27,6 +27,7 @@ Next: the pause menu in the pixel font (Slices), the play-tests below, then what
 - [ ] **The colours and the star shower**: [http://localhost:8141/?debug&mute&shot=bot](http://localhost:8141/?debug&mute&shot=bot): blue-black, mint and a mid green, with stars knocked out of foes. Does the darker green still feel lively? In gray they should separate: [http://localhost:8141/?debug&mute&shot=zoo&view=gray](http://localhost:8141/?debug&mute&shot=zoo&view=gray).
 - [ ] **The hero's animations**: [http://localhost:8141/?debug&mute&room=zoo](http://localhost:8141/?debug&mute&room=zoo): idle with a blink, a 4-frame run, squash on landing and bouncing, rise, fall, hurt, a spinning ball and a smear as a dash leaves; 2-frame walks and flaps for the foes, and twinkling stars.
 - [ ] **A full run after the code split**: [http://localhost:8141](http://localhost:8141): three wells to the end and a high score. It should play, look and sound exactly as v1.0.2.
+- [ ] **The pause menu and initials in the pixel font**: [http://localhost:8141/?debug&mute&shot=pause](http://localhost:8141/?debug&mute&shot=pause) and [http://localhost:8141/?debug&mute&shot=initials](http://localhost:8141/?debug&mute&shot=initials). Move with the keys, a pad, the mouse and, on a phone (`just lan`), a finger: Restart and Quit ask first, the arrows turn the letters. Do the buttons read at a glance, are the arrows big enough to tap, and is the dimmed well behind still the right amount?
 - [ ] **The home-screen icon**: [http://localhost:8141/icons/icon-512.png](http://localhost:8141/icons/icon-512.png): the hero rising, on the ground colour. Does it read at phone-icon size?
 
 ### To hear
@@ -40,10 +41,11 @@ Next: the pause menu in the pixel font (Slices), the play-tests below, then what
 ## Slices
 
 - [x] 1. Title music in 3/4: the hook squeezed to three beats a bar over the same chords, rendered to `music/title.mp3` (answered question 2).
-- [ ] 2. Pause menu and initials in the pixel font on the 320 × 180 screen, to match the HUD (answered question 3). Replaces the HTML cards in `ui/cards.js` and `ui/initials.js`; keyboard, pad and touch must keep working, and the settings screen should match.
+- [x] 2. Pause menu, its questions and the initials drawn on the 320 × 180 screen in the pixel font, to match the HUD (answered question 3): `ui/pixel-menu.js`, sharing its key and pad movement with the settings cards (`ui/menu-nav.js`). Keys, mouse and a finger checked headless.
 
 ## Follow-ups
 
+- [ ] Settings is still HTML cards over the canvas, now the only screen not in the pixel font. Drawing it on the canvas too means sliders, tabs and a list that scrolls in 180 pixels; worth it if the mismatch shows in play.
 - [ ] On the title, the touch pause button opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/settings.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
 - [ ] More chunks: Babonk has 13. A few more per well, some with a new idea (moving blocks, crumbling ledges), would keep runs from repeating. A new idea goes in the museum and gym first.
