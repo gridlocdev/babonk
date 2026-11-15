@@ -4,45 +4,12 @@
 
 Babonk 1.0 is out (v1.0.0, then fixes in v1.0.1 and v1.0.2) and live on gridloc.dev. This stage is the bug fixes, balance, performance and final touches after it. Since 1.0, the code has been split into world, player and render layers with one folder per feature, each feature is tested through its contract, the graphics have quality presets with a frame-rate watchdog, the game installs to a home screen, and there is a gym and a museum beside the zoo (`docs/ARCHITECTURE.md#dev-rooms`). None of that changed how the game plays, looks or sounds; `just rooms` and the tests check it.
 
-Next: the play-tests below, then whatever they turn up.
+Next: the title music in 3/4 and the pause menu in the pixel font (Slices), the play-tests below, then whatever they turn up.
 
 ## For you
 
 - To play: 8 play-tests, under To play
 - To hear: 3, under To hear
-- To answer: 4 questions, under the two question headings
-
-### Questions to answer by playing, listening or looking
-
-1. **Should a dash into a bare wall or floor add to the chain?**
-   - Built now: only foes and crates add to it, because bouncing on a floor let a run farm the chain without end.
-   - Options, my pick first:
-     - **(a) Keep it: only kills add**
-     - (b) A bare bounce adds one, but only once per wall before a kill
-   - Changing it costs: the chain part (`features/chain/index.js`) and its museum exhibit.
-   - Play it: [http://localhost:8141/?debug&mute&room=museum&exhibit=chain](http://localhost:8141/?debug&mute&room=museum&exhibit=chain)
-2. **Should the title music go 5/4 like the wells?**
-   - Built now: the title uses the 4/4 hook; the wells are darker, in 5/4 and 3/4.
-   - Options, my pick first:
-     - **(a) Keep the title in 4/4, so the first well's change of metre is felt**
-     - (b) 5/4 everywhere
-   - Changing it costs: one song spec in `tools/music/songs.js` and a `just music` render.
-   - Listen: [http://localhost:8141](http://localhost:8141)
-
-### Questions only you can choose
-
-3. **Keep the pause menu and initials as HTML cards, or draw them on the screen in the pixel font?**
-   - Built now: HTML cards in the game's colours, with a monospace system font.
-   - Options, my pick first:
-     - **(a) Keep the cards: they're readable at any size and work with every input already**
-     - (b) Draw them on the 320 × 180 screen in the pixel font, to match the HUD
-   - Changing it costs: `ui/cards.js`, `ui/initials.js`, the settings screen's look and its keyboard, pad and touch handling.
-4. **Is three wells (10, 14 and 18 chunks deep) the right length for a run, and is the third hard enough?**
-   - Built now: `WELLS` in `world/wells-data.js`.
-   - Options, my pick first:
-     - **(a) Keep three, and judge the third after a few full runs**
-     - (b) Make the third deeper, or weight it further toward the hardest chunks
-   - Play it: [http://localhost:8141](http://localhost:8141)
 
 ### Not yet checked
 
@@ -68,9 +35,23 @@ Next: the play-tests below, then whatever they turn up.
 - [ ] **The soundtrack**: [http://localhost:8141](http://localhost:8141), [the rest](http://localhost:8141/?debug&shot=rest), [game over](http://localhost:8141/?debug&shot=over). Do the darker 5/4 and 3/4 wells fit the fall, are the drums interesting enough, and do the loops (about every 58 to 68 s) wrap without a hitch?
 - [ ] **The sound effects**: [http://localhost:8141](http://localhost:8141). They're made in code (`audio/sfx-defs.js`); do they fit the look?
 
+## Slices
+
+- [ ] 1. Title music in 3/4: rewrite the title's song spec in `tools/music/songs.js` in 3/4, render it with `just music`, and listen against the wells (answered question 2).
+- [ ] 2. Pause menu and initials in the pixel font on the 320 × 180 screen, to match the HUD (answered question 3). Replaces the HTML cards in `ui/cards.js` and `ui/initials.js`; keyboard, pad and touch must keep working, and the settings screen should match.
+
 ## Follow-ups
 
 - [ ] On the title, the touch pause button opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/settings.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
 - [ ] More chunks: Babonk has 13. A few more per well, some with a new idea (moving blocks, crumbling ledges), would keep runs from repeating. A new idea goes in the museum and gym first.
 - [x] A home-screen icon and web manifest.
+
+## Answered
+
+### Answered questions
+
+1. **Should a dash into a bare wall or floor add to the chain?** No: only kills (foes and crates) add, so floors can't be farmed. 2026-11-15. As built in `features/chain/index.js`.
+2. **Should the title music go 5/4 like the wells?** Neither: make it 3/4. 2026-11-15. Slice 1.
+3. **Keep the pause menu and initials as HTML cards, or draw them in the pixel font?** Draw them on the screen in the pixel font. 2026-11-15. Slice 2.
+4. **Is three wells (10, 14 and 18 chunks deep) the right length, and is the third hard enough?** Keep three as they are, and judge the third after a few full runs. 2026-11-15.
