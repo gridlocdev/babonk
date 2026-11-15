@@ -135,7 +135,6 @@ function writeData(TRACKS, fresh)
             file: `music/${t.id}.mp3`, title: info.title, tempo: info.tempo, beatsPerBar: info.beatsPerBar,
             offset: info.offset, end: info.end, seconds: +info.seconds.toFixed(4), frames: info.frames, rate: info.sampleRate ?? info.rate, loop: info.loop,
             ...(info.bars && { bars: info.bars }),
-            ...(t.layerOf && { layerOf: t.layerOf, place: t.place, level: t.level }),
         };
     }
     const body = JSON.stringify(all, null, 4);
@@ -144,8 +143,7 @@ function writeData(TRACKS, fresh)
 // offset + n * 60 / tempo, and end is where the last bar ends (a one-shot's reverb rings on after it). loop is the
 // part a looping track repeats, start and end on bar lines; null plays once. frames at rate is the file's exact
 // length, for checking a decoder trimmed the mp3's encoder delay. bars, when the meter changes, lists every bar line
-// (seconds into the file) up to the loop's end. A layer (layerOf) plays in step with that track,
-// up to its level, the nearer the player is to its place.
+// (seconds into the file) up to the loop's end.
 export const TRACKS = ${body};
 `);
     log(`wrote ${path.relative(ROOT, DATA)}`);
