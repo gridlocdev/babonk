@@ -29,6 +29,8 @@ export const state = {
 // move old save shapes into slices so existing players keep their progress
 function migrate(d)
 {
+    // the top ten and last initials moved from the 'babonk' slice to the run feature's
+    if (d.babonk && !d.run) { d.run = d.babonk; delete d.babonk; }
     // the Sound and Music switches, then 0-10 volume steps, became the standard settings (game/settings.js);
     // only values that differ from the defaults are kept there, and mergeSettings drops anything invalid
     const core = d.core && typeof d.core === 'object' ? d.core : null;

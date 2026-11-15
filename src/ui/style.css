@@ -1,4 +1,4 @@
-/* Babonk's three colours: the ground, pale mint and a mid green for danger and reward (sprites-data.js PALETTE) */
+/* Babonk's three colours: the ground, pale mint and a mid green for danger and reward (render/sprites-data.js PALETTE) */
 :root {
   --ground: #0b0f1e; --mint: #dcefe2; --accent: #469e1a;
   --ui: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;

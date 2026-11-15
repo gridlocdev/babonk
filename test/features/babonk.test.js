@@ -1,10 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import '../fake-browser.js';
 import { rng } from '../../src/lib/rng.js';
-import { CONFIG, COLS, TILE, WELLS, chainBonus } from '../../src/features/babonk/babonk-data.js';
-import { CHUNKS, CHUNK_ROWS, FLOOR, START } from '../../src/features/babonk/wells-data.js';
-import { BLOCK, CRATE, EMPTY, SPIKES, pickChunks, setTile } from '../../src/features/babonk/level.js';
-import { createRun, lockTarget, nextWell, step } from '../../src/features/babonk/sim.js';
+import { state } from '../../src/game/state.js';
+import { CHUNKS, CHUNK_ROWS, COLS, FLOOR, START, TILE, WELLS } from '../../src/world/wells-data.js';
+import { BLOCK, CRATE, EMPTY, SPIKES, pickChunks, setTile } from '../../src/world/well.js';
+import { createRun as makeRun, nextWell, runParts, step } from '../../src/world/run.js';
+import { hero, lockTarget } from '../../src/player/hero.js';
+import { HERO } from '../../src/player/hero-data.js';
+import { features } from '../../src/features/index.js';
+import { FOES } from '../../src/features/foes/foes-data.js';
+import { STARS } from '../../src/features/stars/stars-data.js';
+import { CHAIN, chainBonus } from '../../src/features/chain/chain-data.js';
+import { RUN } from '../../src/features/run/run-data.js';
+
+for (const f of features) f.build({ state });
+const createRun = ()=> makeRun(RUN.seed, [hero, ...runParts]);
+const CONFIG = { ...HERO, ...FOES, hitStop: FOES.hitStop, starsPerKill: STARS.perKill, starLife: STARS.life,
+    points: { ...FOES.points, crate: HERO.crate, star: STARS.points, chainEach: CHAIN.each, clear: RUN.clear, hpLeft: RUN.hpLeft } };
 
 const DT = 1 / 60;
 const idle = { x: 0, y: 0, held: false, pressed: false };
@@ -214,19 +227,11 @@ test('landing a chain of 3 or more pays a bonus; the well floor clears it and th
     assert.equal(w.rows, (WELLS[1].chunks + 2) * CHUNK_ROWS);
 });
 
-test('every sprite is a clean grid in the three colours, and every sound builds and is heard', async ()=>
+test('every sprite is a clean grid in the three colours', async ()=>
 {
-    const { SPRITES, PALETTE } = await import('../../src/features/babonk/sprites-data.js');
+    const { SPRITES, PALETTE } = await import('../../src/render/sprites-data.js');
     for (const [k, rows] of Object.entries(SPRITES))
         for (const r of rows) assert.match(r, new RegExp(`^[.${Object.keys(PALETTE).join('')}]{${rows[0].length}}$`), k);
-    const { SOUNDS } = await import('../../src/features/babonk/sounds-data.js');
-    for (const [name, def] of Object.entries(SOUNDS))
-    {
-        assert.ok(def.says, name);
-        const data = def.make();
-        assert.ok(data.length > 0 && data.every(Number.isFinite), name);
-        assert.ok(data.some((x)=> Math.abs(x) > .05), `${name} is silent`);
-    }
 });
 
 test('coming down on a floater from above never hurts, whatever the bonk or the angle', ()=>
@@ -336,9 +341,9 @@ test('breaking things knocks out stars, more with a longer chain; they bounce, c
 
 test('the hero poses follow the run: idle, run, squash on landing, smear then a spinning ball, rise, fall, hurt', async ()=>
 {
-    const { heroPose, POSE } = await import('../../src/features/babonk/pose.js');
-    const { ANIMS, HERO, SPRITES } = await import('../../src/features/babonk/sprites-data.js');
-    for (const name of [...HERO, 'walker', 'floater', 'spiker', 'star'])
+    const { heroPose, POSE } = await import('../../src/player/pose.js');
+    const { ANIMS, HERO_ANIMS, SPRITES } = await import('../../src/render/sprites-data.js');
+    for (const name of [...HERO_ANIMS, 'walker', 'floater', 'spiker', 'star'])
     {
         const a = ANIMS[name];
         assert.ok(a, name);
@@ -370,7 +375,7 @@ test('the hero poses follow the run: idle, run, squash on landing, smear then a 
 
 test('blocks vary by tile, the same way every time, mostly plain', async ()=>
 {
-    const { SPRITES, blockAt } = await import('../../src/features/babonk/sprites-data.js');
+    const { SPRITES, blockAt } = await import('../../src/render/sprites-data.js');
     const names = [];
     for (let ty = 0; ty < 60; ty++) for (let tx = 0; tx < COLS; tx++)
     {

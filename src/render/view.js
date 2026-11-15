@@ -1,55 +1,32 @@
 // Babonk's picture: drawn each frame on the 320 × 180 screen in three colours; platform/engine.js shows it scaled up
-// by a whole number. The well runs down the middle with the HUD either side. Effects (bits flying, a shake, the chain
-// count) come from the run's w.fx queue.
-import { MOBILE, pixelScreen } from '../../platform/engine.js';
-import { frameAt } from '../../lib/anim.js';
-import { setting } from '../../game/settings.js';
-import { pixelCentre, pixelText } from '../../ui/pixel-text.js';
-import { COLS, SCREEN, TILE, WELL_X } from './babonk-data.js';
-import { BLOCK, CRATE, SPIKES, tileAt } from './level.js';
-import { depth, invulnerable, lockTarget, wellCount } from './sim.js';
-import { heroPose } from './pose.js';
-import { ANIMS, PALETTE, SPRITES, blockAt } from './sprites-data.js';
+// by a whole number. The well runs down the middle with the HUD either side. Features draw what they add to the well
+// through addRunLayer(); effects (bits flying, a shake, the chain count) come from the run's w.fx queue.
+import { MOBILE } from '../platform/engine.js';
+import { setting } from '../game/settings.js';
+import { pixelCentre, pixelText } from '../ui/pixel-text.js';
+import { COLS, TILE } from '../world/wells-data.js';
+import { BLOCK, CRATE, SPIKES, tileAt } from '../world/well.js';
+import { depth, wellCount } from '../world/run.js';
+import { invulnerable, lockTarget } from '../player/hero.js';
+import { HERO } from '../player/hero-data.js';
+import { heroPose } from '../player/pose.js';
+import { PALETTE, blockAt } from './sprites-data.js';
+import { SCREEN, draw, frameOf, g, sprite, white, whiteMirror } from './screen.js';
 import { checkView, drawZoo } from './zoo.js';
 
 const W = SCREEN.w, H = SCREEN.h;
+// the well sits in the middle of the screen with the HUD either side
+const WELL_X = (W - COLS * TILE) / 2;
 const BONE = PALETTE.W, ORANGE = PALETTE.O, BLACK = PALETTE.K;   // the pale, accent and ground colours
-
-const g = pixelScreen(W, H);
-
-// every sprite baked to a small canvas, with a mirrored copy for facing left, and an all-mint copy of each way for the
-// flash of a foe as it's hit
-function bake(rows, flip, ink)
-{
-    const c = document.createElement('canvas');
-    c.width = rows[0].length; c.height = rows.length;
-    const s = c.getContext('2d');
-    rows.forEach((row, y)=> [...row].forEach((ch, x)=>
-    {
-        if (ch === '.') return;
-        s.fillStyle = ink ?? PALETTE[ch];
-        s.fillRect(flip ? c.width - 1 - x : x, y, 1, 1);
-    }));
-    return c;
-}
-const sprite = {}, mirror = {}, white = {}, whiteMirror = {};
-for (const [k, rows] of Object.entries(SPRITES))
-{
-    sprite[k] = bake(rows, false); mirror[k] = bake(rows, true);
-    white[k] = bake(rows, false, PALETTE.W); whiteMirror[k] = bake(rows, true, PALETTE.W);
-}
 const TILE_SPRITE = { [CRATE]: 'crate', [SPIKES]: 'spikes' };
+
+// what features draw in the well, under the hero, lowest z first: draw(w, { ox, oy, camY, clock, h })
+const layers = [];
+export function addRunLayer(z, drawLayer) { layers.push({ z, draw: drawLayer }); layers.sort((a, b)=> a.z - b.z); }
 
 let clock = 0, camY = 0, camWell = -1, shake = 0, flash = 0;
 const bits = [], labels = [], ghosts = [], hits = [];
 
-function draw(name, x, y, left = false) { g.drawImage((left ? mirror : sprite)[name], Math.round(x), Math.round(y)); }
-// the frame of animation `name` that shows `time` seconds in
-export function frameOf(name, time)
-{
-    const a = ANIMS[name];
-    return a.frames.length > 1 ? a.frames[frameAt(a.times, time, a.loop !== false)] : a.frames[0];
-}
 // a sideways smear is wider than the hero, so it sits a pixel out each side
 const OFFSET = { smearH: [-1, 1] };
 function drawHero(name, time, x, y, left)
@@ -93,17 +70,7 @@ function drawWell(w, ox, oy)
             const name = t === BLOCK ? blockAt(tx, ty) : TILE_SPRITE[t];
             if (name) draw(name, ox + tx * TILE, oy + ty * TILE);
         }
-    // stars blink for their last second
-    const c = w.cfg;
-    for (const s of w.stars) if (s.t < w.cfg.starLife - 1 || Math.floor(clock * 12) % 2) draw(frameOf('star', clock + s.x * .01), ox + Math.round(s.x), oy + Math.round(s.y));
-    for (const f of w.foes)
-    {
-        if (!f.alive || f.y + f.h < camY - 8 || f.y > camY + H + 8) continue;
-        const mad = f.kind === 'floater' && f.chasing;
-        draw(frameOf(mad ? 'floaterMad' : f.kind, clock + f.phase), ox + f.x, oy + f.y, f.kind !== 'floater' && f.dir < 0);
-        // the tell: a '!' over a floater that has just spotted you, before it comes
-        if (mad && w.t - f.alertAt < c.floaterTell) draw('bang', ox + f.x + 3, oy + f.y - 9);
-    }
+    for (const l of layers) l.draw(w, { ox, oy, camY, clock, h: H });
     for (const h of hits) g.drawImage((h.left ? whiteMirror : white)[h.name], Math.round(ox + h.fx), Math.round(oy + h.fy));
 
     const p = w.player;
@@ -123,7 +90,7 @@ function drawWell(w, ox, oy)
     {
         g.fillStyle = BONE;
         const x = Math.round(ox + gh.x), y = Math.round(oy + gh.y);
-        for (let yy = 0; yy < c.playerH; yy++) for (let xx = (yy + Math.round(gh.x)) % 2; xx < c.playerW; xx += 2) g.fillRect(x + xx, y + yy, 1, 1);
+        for (let yy = 0; yy < HERO.h; yy++) for (let xx = (yy + Math.round(gh.x)) % 2; xx < HERO.w; xx += 2) g.fillRect(x + xx, y + yy, 1, 1);
     }
 
     const blink = invulnerable(w) && Math.floor(clock * 15) % 2;
@@ -148,7 +115,7 @@ function drawHud(w)
 {
     const left = 8, right = WELL_X + COLS * TILE + 8;
     pixelText(g, 'HP', left, 8, 10, BONE);
-    for (let i = 0; i < w.cfg.maxHp; i++)
+    for (let i = 0; i < HERO.maxHp; i++)
     {
         g.fillStyle = ORANGE;
         if (i < w.hp) g.fillRect(left + i * 9, 22, 7, 7);

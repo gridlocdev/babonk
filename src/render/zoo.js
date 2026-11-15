@@ -1,8 +1,8 @@
-// Babonk's zoo, a debug screen (?debug&shot=zoo): every animation playing at 3×, every frame side by side at
+// The sprite zoo, a debug screen (?debug&shot=zoo): every animation playing at 3×, every frame side by side at
 // the game's own scale, and a little ledge with the cast at play size, so a new sprite shows up the moment it's added
 // to sprites-data.js. &view=gray or &view=silhouette swaps in a check view, &t=<seconds> freezes the clock for stills.
-import { pixelCentre, pixelText } from '../../ui/pixel-text.js';
-import { ANIMS, HERO, PALETTE, blockAt } from './sprites-data.js';
+import { pixelCentre, pixelText } from '../ui/pixel-text.js';
+import { ANIMS, HERO_ANIMS, PALETTE, blockAt } from './sprites-data.js';
 
 const BIG = 3;
 const FOES = ['walker', 'floater', 'floaterMad', 'spiker', 'star'];
@@ -25,7 +25,7 @@ export function drawZoo(g, ctx)
 
     // the hero, every animation playing
     const cw = 35;
-    HERO.forEach((name, i)=> cell(g, ctx, name, ctx.frameOf(name, t), 2 + i * cw, 14, cw, i));
+    HERO_ANIMS.forEach((name, i)=> cell(g, ctx, name, ctx.frameOf(name, t), 2 + i * cw, 14, cw, i));
     // foes and the star, then the tiles, in narrower cells to fit
     const cf = 31;
     FOES.forEach((name, i)=> cell(g, ctx, name, ctx.frameOf(name, t), 4 + i * cf, 60, cf, i));

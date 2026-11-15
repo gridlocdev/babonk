@@ -1,5 +1,5 @@
-// Babonk: a pixel platformer down three wells. The rules are in sim.js, the picture in view.js; this file runs the
-// title, pause menu, settings, rests between wells and the high-score table.
+// The run and its screens: the title, play, the pause menu, settings, rests between wells, game over and the high-score
+// table. A run is world/run.js with the hero first, then the parts other features added; the picture is render/view.js.
 import { FLAGS } from '../../platform/engine.js';
 import { input } from '../../platform/input.js';
 import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
@@ -11,11 +11,13 @@ import { showInitials } from '../../ui/initials.js';
 import { letterIn, spellOut } from '../../ui/kinetic.js';
 import { showSettings } from '../../ui/settings-screen.js';
 import { touch } from '../../ui/touch.js';
-import { CONFIG, clearBonus } from './babonk-data.js';
-import { createRun, lockTarget, nextWell, step, wellCount } from './sim.js';
-import { SOUNDS } from './sounds-data.js';
-import { PALETTE } from './sprites-data.js';
-import { pressWord, render, settingsWord } from './view.js';
+import { addRunPart, createRun, nextWell, runParts, say, step, wellCount } from '../../world/run.js';
+import { TILE } from '../../world/wells-data.js';
+import { hero, lockTarget } from '../../player/hero.js';
+import { HERO } from '../../player/hero-data.js';
+import { PALETTE } from '../../render/sprites-data.js';
+import { pressWord, render, settingsWord } from '../../render/view.js';
+import { RUN, clearBonus } from './run-data.js';
 
 const STEP = 1 / 60;
 
@@ -33,10 +35,10 @@ const ZOO_T = FLAGS.debug && FLAGS.params.has('t') ? Number(FLAGS.params.get('t'
 function setMode(m) { mode = m; modeTime = 0; setMusicDuck(m === 'paused' || m === 'settings' && settingsFrom === 'paused' ? .4 : 1); }
 function controls() { touch.show('hold'); touch.holdLabel('BONK'); }
 
-function startRun(seed = FLAGS.debug ? CONFIG.seed : (Math.random() * 2 ** 31) | 0)
+function startRun(seed = FLAGS.debug ? RUN.seed : (Math.random() * 2 ** 31) | 0)
 {
-    sfx.play('babonkJump');
-    run = createRun(seed);
+    sfx.play('jump');
+    run = createRun(seed, [hero, ...runParts]);
     acc = 0;
     setMode('play');
 }
@@ -92,7 +94,7 @@ function openSettings(from)
     touch.show(false);
     showSettings({
         color: PALETTE.O,
-        sound: (what)=> sfx.play(what === 'move' ? 'uiMove' : what === 'pick' ? 'uiPick' : 'babonkStar'),
+        sound: (what)=> sfx.play(what === 'move' ? 'uiMove' : what === 'pick' ? 'uiPick' : 'star'),
         close()
         {
             if (settingsFrom === 'paused') { showPause(1); return; }
@@ -107,7 +109,7 @@ function askInitials()
     touch.show(false);
     showInitials({
         start: save.lastName ?? 'AAA',
-        change: ()=> sfx.play('babonkStar'),
+        change: ()=> sfx.play('star'),
         move: ()=> sfx.play('uiMove'),
         done(name)
         {
@@ -129,7 +131,7 @@ function finish(won)
 
 function playSounds()
 {
-    for (const e of run.sfx) sfx.play('babonk' + e.id[0].toUpperCase() + e.id.slice(1), 1, e.pitch);
+    for (const e of run.sfx) sfx.play(e.id, 1, e.pitch);
     run.sfx.length = 0;
 }
 
@@ -165,7 +167,7 @@ function playStep(dt)
     else if (run.state === 'clear')
     {
         if (run.well + 1 >= wellCount()) finish(true);
-        else { rest = { bonus: clearBonus(run.hp), healed: run.hp < CONFIG.maxHp }; setMode('rest'); }
+        else { rest = { bonus: clearBonus(run.hp), healed: run.hp < HERO.maxHp }; setMode('rest'); }
     }
 }
 
@@ -181,14 +183,25 @@ function musicFor()
     return 'title';
 }
 
+// the last part of every run: landing on the well's floor clears it
+const floor = {
+    landed(w)
+    {
+        if (w.player.y + HERO.h < (w.rows - 1) * TILE) return;
+        w.state = 'clear';
+        w.score += clearBonus(w.hp);
+        say(w, 'clear');
+    },
+};
+
 export default {
-    id: 'babonk',
+    id: 'run',
     build({ state })
     {
         ctxState = state;
-        save = state.slice('babonk', { table: [], lastName: 'AAA' });
-        for (const [name, def] of Object.entries(SOUNDS)) sfx.define('babonk' + name[0].toUpperCase() + name.slice(1), def);
-        run = createRun();
+        save = state.slice('run', { table: [], lastName: 'AAA' });
+        addRunPart(floor);
+        run = createRun(RUN.seed, [hero, ...runParts]);
         // the pause button: the pause menu in play, settings on the title
         touch.onPause(()=> { if (mode === 'play') showPause(); else if (mode === 'menu') openSettings('menu'); });
         // leaving the tab mid-run pauses it, so the run doesn't go on unseen
@@ -222,7 +235,7 @@ export default {
         if (mode === 'play') { playStep(dt); return; }
         if (mode === 'rest')
         {
-            if (modeTime > .8 && pressed()) { sfx.play('babonkJump'); nextWell(run); acc = 0; setMode('play'); }
+            if (modeTime > .8 && pressed()) { sfx.play('jump'); nextWell(run); acc = 0; setMode('play'); }
             return;
         }
         if (mode === 'over' && modeTime > 1.2 && (pressed() || input.back()))

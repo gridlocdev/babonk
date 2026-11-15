@@ -342,7 +342,7 @@ export const ANIMS = {
 };
 
 // the hero's animations in the order the zoo shows them
-export const HERO = ['idle', 'run', 'squash', 'rise', 'fall', 'hurt', 'ball', 'smearV', 'smearH'];
+export const HERO_ANIMS = ['idle', 'run', 'squash', 'rise', 'fall', 'hurt', 'ball', 'smearV', 'smearH'];
 
 // the plain block most of the time, a cracked or chipped one now and then, always the same one at the same tile
 export const BLOCKS = ['block', 'block', 'block', 'block', 'block', 'block1', 'block', 'block', 'block2', 'block'];

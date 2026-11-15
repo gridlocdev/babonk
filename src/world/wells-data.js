@@ -1,3 +1,17 @@
+// The wells: their size, the physics everything in them falls by, how deep each is and what it's stacked from.
+// Distances are pixels of the 320 × 180 screen, y down; times in seconds. The well is COLS tiles wide, walls included.
+export const TILE = 8;
+export const COLS = 20;
+// everything that falls (the hero, walkers, stars) falls the same
+export const GRAVITY = 640, MAX_FALL = 210;
+
+// the three wells: how many chunks deep, and how likely each tier of chunk is
+export const WELLS = [
+    { chunks: 10, tiers: { 0: 1 } },
+    { chunks: 14, tiers: { 0: .4, 1: .6 } },
+    { chunks: 18, tiers: { 1: .45, 2: .55 } },
+];
+
 // The hand-made chunks a well is stacked from: 18 tiles wide (the walls either side are added) and 10 tall.
 // Every chunk's top and bottom rows are open, so any chunk can sit on any other and the well stays passable.
 //   .  empty      #  block      x  crate (bonk it to break it)      ^  spikes

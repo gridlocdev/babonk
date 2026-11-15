@@ -6,7 +6,7 @@ Babonk uses the standard settings table in `src/lib/settings.js`: the same ids, 
 
 Removed, because Babonk can't apply them yet:
 
-- `difficulty.preset`: no presets yet (`features/babonk/babonk-data.js` has one set of numbers). With no rows, Difficulty has no tab.
+- `difficulty.preset`: no presets yet (the game has one set of numbers). With no rows, Difficulty has no tab.
 - `controls.stickSensitivity`: the stick only moves; there is no look or cursor.
 - `controls.holdActions`: the one button's hold (the jump cut) has no sensible toggle.
 - `controls.vibration`: no rumble yet.
@@ -30,7 +30,7 @@ Ranges are `min–max, step`.
 | `controls.deadzone` | range | 0.05–0.4, 0.05 | 0.15 | the stick read in `platform/input.js` |
 | `display.brightness` | range | 0.5–1.5, 0.05 | 1 | a `brightness()` filter on the canvas, `platform/engine.js` |
 | `display.showFps` | toggle | | off | a corner readout, `ui/fps.js` |
-| `a11y.shake` | range | 0–1, 0.25 | 1 (0 with reduced motion) | scales every shake in `features/babonk/view.js` |
+| `a11y.shake` | range | 0–1, 0.25 | 1 (0 with reduced motion) | scales every shake in `render/view.js` |
 | `a11y.reduceFlashing` | toggle | | off (on with reduced motion) | drops the whole-well flash when hurt |
 | `a11y.gameSpeed` | range | 0.5–1, 0.1 | 1 | scales the run's time step; menus, music and sounds keep their pace |
 

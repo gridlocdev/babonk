@@ -1,7 +1,6 @@
-// Building a well from chunks, and asking it what's where. Pure: no engine, so it's tested in node.
-// Tiles: 0 empty, 1 block, 2 crate, 3 spikes. Columns 0 and COLS - 1 are the well's walls.
-import { COLS, TILE, WELLS } from './babonk-data.js';
-import { CHUNKS, CHUNK_ROWS, FLOOR, START } from './wells-data.js';
+// A well: chunks stacked into one tile grid, asking it what's where, and moving boxes through it. Pure: no engine, so
+// it's tested in node. Tiles: 0 empty, 1 block, 2 crate, 3 spikes. Columns 0 and COLS - 1 are the well's walls.
+import { CHUNKS, CHUNK_ROWS, COLS, FLOOR, START, TILE, WELLS } from './wells-data.js';
 
 export const EMPTY = 0, BLOCK = 1, CRATE = 2, SPIKES = 3;
 const TILE_OF = { '#': BLOCK, x: CRATE, '^': SPIKES };
@@ -25,12 +24,12 @@ export function pickChunks(index, rng)
     return out;
 }
 
-// { rows, grid, foes } for a stack of chunks
+// { rows, grid, spawns } for a stack of chunks; spawns are where the chunks place foes
 export function buildWell(chunks)
 {
     const rows = chunks.length * CHUNK_ROWS;
     const grid = new Uint8Array(rows * COLS);
-    const foes = [];
+    const spawns = [];
     chunks.forEach((chunk, ci)=>
     {
         chunk.forEach((line, r)=>
@@ -41,11 +40,11 @@ export function buildWell(chunks)
             {
                 const ch = line[i], tx = i + 1;
                 if (TILE_OF[ch]) grid[ty * COLS + tx] = TILE_OF[ch];
-                else if (FOE_OF[ch]) foes.push({ kind: FOE_OF[ch], tx, ty });
+                else if (FOE_OF[ch]) spawns.push({ kind: FOE_OF[ch], tx, ty });
             }
         });
     });
-    return { rows, grid, foes };
+    return { rows, grid, spawns };
 }
 
 // the tile at (tx, ty): outside the walls is solid, above the top is open, below the bottom is solid
@@ -71,3 +70,31 @@ export function hitTile(well, x, y, w, h)
         }
     return null;
 }
+
+// move a box by (dx, dy), one axis at a time, stopping at solid tiles. Returns what it hit on each axis
+export function move(well, b, dx, dy)
+{
+    const hits = { x: null, y: null };
+    b.x += dx;
+    let h = dx ? hitTile(well, b.x, b.y, b.w, b.h) : null;
+    if (h) { b.x = dx > 0 ? h.tx * TILE - b.w : (h.tx + 1) * TILE; hits.x = { ...h, dir: Math.sign(dx) }; }
+    b.y += dy;
+    h = dy ? hitTile(well, b.x, b.y, b.w, b.h) : null;
+    if (h) { b.y = dy > 0 ? h.ty * TILE - b.h : (h.ty + 1) * TILE; hits.y = { ...h, dir: Math.sign(dy) }; }
+    return hits;
+}
+
+// nothing solid on the straight line between two points
+export function clearLine(well, ax, ay, bx, by)
+{
+    const n = Math.ceil(Math.hypot(bx - ax, by - ay) / 3);
+    for (let i = 1; i < n; i++)
+    {
+        const x = ax + (bx - ax) * i / n, y = ay + (by - ay) * i / n;
+        if (solid(tileAt(well, Math.floor(x / TILE), Math.floor(y / TILE)))) return false;
+    }
+    return true;
+}
+
+export const centre = (b)=> [b.x + b.w / 2, b.y + b.h / 2];
+export const overlap = (a, b)=> a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
