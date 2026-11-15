@@ -8,7 +8,7 @@ Babonk is plain ES modules with no bundler and no runtime dependencies. The game
 src/
   lib/        pure helpers: seeded rng, sound synthesis, pixel-font (the bitmap font), high-scores (the top-ten table),
               anim (sprite-frame timing), settings (the standard settings table, docs/settings.md)
-  platform/   engine.js (the canvas and its whole-number scaling, URL FLAGS, MOBILE, the fixed-step loop), input, storage
+  platform/   engine.js (the canvas and its whole-number scaling, URL FLAGS, MOBILE, the fixed-step loop), graphics (quality presets and the frame-rate watchdog), input, storage
   game/       events (pub/sub), state (the save), loop (the system list), settings (the live settings values, `core` slice)
   world/      wells-data.js (sizes, gravity, the wells and their chunks), well.js (the tile grid, moving boxes through it),
               run.js (a run: its wells, its parts, the fixed step and the hit stop)
@@ -48,6 +48,8 @@ tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the
 ## The screen
 
 `pixelScreen(w, h)` in `platform/engine.js` sizes the one canvas and returns its 2D context. On every resize it picks the largest whole scale in device pixels that fits the window and puts the canvas's corner on a device pixel, with `image-rendering: pixelated`, so every game pixel is the same size and sharp on any pixel ratio. A window smaller than 320 × 180 device pixels gets a fitting fractional scale instead. The page around it is the ground colour, `#0b0f1e`.
+
+That canvas is cheap, so there is no pixel ratio or resolution to lower. `platform/graphics.js` holds the Graphics quality presets, which thin the effects instead (bits per break, dash afterimages), and a watchdog the loop feeds each frame's length: in Automatic, under 40 frames a second for 3 seconds steps down one preset, at most once every 10 seconds, and choosing a preset by hand starts it over. `render/view.js` reads `graphics.preset`; the debug readout shows which (`gfx`).
 
 ## The run
 

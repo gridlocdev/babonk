@@ -5,17 +5,18 @@ import {
     changedSettings, defineSettings, mergeSettings, resetGroup, setSetting, stepSetting, visibleSettings,
 } from '../lib/settings.js';
 import { setBrightness } from '../platform/engine.js';
+import { graphics } from '../platform/graphics.js';
 import { input } from '../platform/input.js';
 import { events } from './events.js';
 import { state } from './state.js';
 
-// what Babonk can't apply yet: no difficulty presets, no look, no rumble, no quality presets or render scale on a
-// fixed 320 × 180 pixel screen, no dialogue, and canvas text that has one size, font and palette
+// what Babonk can't apply yet: no difficulty presets, no look, no rumble, no render scale on a fixed 320 × 180 pixel
+// screen, no dialogue, and canvas text that has one size, font and palette
 export const SCHEMA = defineSettings({
     remove: [
         'difficulty.preset',
         'controls.stickSensitivity', 'controls.holdActions', 'controls.vibration',
-        'display.quality', 'display.renderScale',
+        'display.renderScale',
         'a11y.textScale', 'a11y.subtitles', 'a11y.captions', 'a11y.highContrast', 'a11y.plainFont',
     ],
 });
@@ -30,6 +31,7 @@ function applyLow(id, value)
 {
     if (id === 'controls.deadzone') input.setDeadzone(value);
     else if (id === 'display.brightness') setBrightness(value);
+    else if (id === 'display.quality') graphics.set(value);
 }
 
 export function loadSettings()

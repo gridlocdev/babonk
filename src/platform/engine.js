@@ -37,6 +37,8 @@ export function pixelScreen(w, h)
     return g;
 }
 
+import { watchFrames } from './graphics.js';
+
 // the Brightness setting: a filter on the one canvas (1 leaves it alone)
 export function setBrightness(v) { canvas.style.filter = v === 1 ? '' : `brightness(${v})`; }
 
@@ -57,6 +59,7 @@ export function startLoop(update, draw)
         bank += dt * clock.speed;
         for (let n = 0; bank >= STEP && n < 12; n++) { bank -= STEP; update(STEP); }
         if (bank > STEP * 4) bank = 0;
+        watchFrames(dt);
         draw(dt);
     };
     requestAnimationFrame(frame);

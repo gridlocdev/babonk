@@ -10,7 +10,7 @@ Removed, because Babonk can't apply them yet:
 - `controls.stickSensitivity`: the stick only moves; there is no look or cursor.
 - `controls.holdActions`: the one button's hold (the jump cut) has no sensible toggle.
 - `controls.vibration`: no rumble yet.
-- `display.quality`, `display.renderScale`: the screen is a fixed 320 × 180 canvas at a whole-number scale.
+- `display.renderScale`: the screen is a fixed 320 × 180 canvas at a whole-number scale.
 - `a11y.textScale`, `a11y.plainFont`, `a11y.highContrast`: canvas text is the pixel font at one size, in a three-colour palette.
 - `a11y.subtitles`, `a11y.captions`: no dialogue, and every sound has something to see with it.
 
@@ -28,6 +28,7 @@ Ranges are `min–max, step`.
 | `audio.mono` | toggle | | off | master folded to one channel |
 | `audio.background` | toggle | | off | a hidden tab keeps its sound |
 | `controls.deadzone` | range | 0.05–0.4, 0.05 | 0.15 | the stick read in `platform/input.js` |
+| `display.quality` | choice | auto, low, medium, high | auto | `platform/graphics.js`: fewer flying bits and no dash afterimages lower down; Automatic starts on high and steps down while frames run under 40 a second |
 | `display.brightness` | range | 0.5–1.5, 0.05 | 1 | a `brightness()` filter on the canvas, `platform/engine.js` |
 | `display.showFps` | toggle | | off | a corner readout, `ui/fps.js` |
 | `a11y.shake` | range | 0–1, 0.25 | 1 (0 with reduced motion) | scales every shake in `render/view.js` |

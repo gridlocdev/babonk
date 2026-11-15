@@ -1,5 +1,6 @@
 // ?debug only, never loaded by the shipped game: the live readout, the console hook and the debug keys.
 import { FLAGS } from '../platform/engine.js';
+import { graphics } from '../platform/graphics.js';
 
 export function installDebug({ state, events, loop, clock, features })
 {
@@ -14,8 +15,8 @@ export function installDebug({ state, events, loop, clock, features })
     el.hidden = false;
     const panel = ()=>
     {
-        const now = features.map((f)=> f.debug?.()).find(Boolean);
-        el.textContent = JSON.stringify(now ?? {}).replace(/[{}"]/g, '').replace(/,/g, '  ');
+        const now = { ...features.map((f)=> f.debug?.()).find(Boolean), gfx: graphics.name };
+        el.textContent = JSON.stringify(now).replace(/[{}"]/g, '').replace(/,/g, '  ');
     };
     setInterval(panel, 100);
 }

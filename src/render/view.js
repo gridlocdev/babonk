@@ -2,6 +2,7 @@
 // by a whole number. The well runs down the middle with the HUD either side. Features draw what they add to the well
 // through addRunLayer(); effects (bits flying, a shake, the chain count) come from the run's w.fx queue.
 import { MOBILE } from '../platform/engine.js';
+import { graphics } from '../platform/graphics.js';
 import { setting } from '../game/settings.js';
 import { pixelCentre, pixelText } from '../ui/pixel-text.js';
 import { COLS, TILE } from '../world/wells-data.js';
@@ -37,9 +38,10 @@ function drawHero(name, time, x, y, left)
 
 function burst(e, colour, kick)
 {
-    for (let i = 0; i < 8; i++)
+    const n = graphics.preset.bits;
+    for (let i = 0; i < n; i++)
     {
-        const a = i / 8 * Math.PI * 2 + Math.random() * .4, v = 50 + Math.random() * 60;
+        const a = i / n * Math.PI * 2 + Math.random() * .4, v = 50 + Math.random() * 60;
         bits.push({ x: e.x, y: e.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, life: .5, c: colour });
     }
     shake = Math.max(shake, kick * setting('a11y.shake'));
@@ -85,7 +87,7 @@ function drawWell(w, ox, oy)
     }
 
     // afterimages trail a bonk, every other pixel lit
-    if (p.dash) ghosts.push({ x: p.x, y: p.y, life: .12 });
+    if (p.dash && graphics.preset.ghosts) ghosts.push({ x: p.x, y: p.y, life: .12 });
     for (const gh of ghosts)
     {
         g.fillStyle = BONE;
