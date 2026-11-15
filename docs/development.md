@@ -1,6 +1,6 @@
 # Development
 
-Babonk is plain JavaScript ES modules on one 2D canvas, with no bundler and no runtime dependencies. The rules in `AGENTS.md` at the repository root apply to everyone working on it, and the code layout and its layer rules are in [architecture.md](architecture.md).
+Babonk is plain JavaScript ES modules on one 2D canvas, with no bundler and no runtime dependencies. The rules in `AGENTS.md` at the repository root apply to everyone working on it, and the code layout and its layer rules are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Getting set up
 
@@ -34,7 +34,7 @@ just test    # tests for lib/, *-data.js, the world and hero, and each feature t
 
 ## Debug flags
 
-Add `?debug` to the URL for a readout, a fixed seed and slow motion (`1`) or fast forward (`2`). `?debug&shot=bot` plays a run with a simple pilot, `?debug&shot=zoo` shows every sprite and animation, `?debug&room=gym` the movement numbers and `?debug&room=museum` each system working; `just rooms` runs them as smoke tests and screenshots them. The full list is in [architecture.md](architecture.md#debug-flags).
+Add `?debug` to the URL for a readout, a fixed seed and slow motion (`1`) or fast forward (`2`). `?debug&shot=bot` plays a run with a simple pilot, `?debug&shot=zoo` shows every sprite and animation, `?debug&room=gym` the movement numbers and `?debug&room=museum` each system working; `just rooms` runs them as smoke tests and screenshots them. The full list is in [ARCHITECTURE.md](ARCHITECTURE.md#debug-flags).
 
 ## Performance
 
@@ -44,7 +44,7 @@ Add `?debug` to the URL for a readout, a fixed seed and slow motion (`1`) or fas
 just bench "" "debug&shot=bot" "debug&shot=zoo" --repeat 2
 ```
 
-60 fps with p95 under about 18 ms is healthy. The options are in [architecture.md](architecture.md#checking).
+60 fps with p95 under about 18 ms is healthy. The options are in [ARCHITECTURE.md](ARCHITECTURE.md#checking).
 
 ## The soundtrack
 

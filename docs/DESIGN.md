@@ -10,4 +10,5 @@ A one-screen-wide pixel platformer down a vertical well. You fall, and you keep 
 - Points for foes, crates and stars, a bonus for a chain of 3 or more when you land, and one for each HP left at the bottom of a well. A top-ten table with three initials.
 - The screen is 320 × 180, shown in big square pixels at the largest whole scale that fits the window, in three colours: a deep blue-black ground, pale mint, and a mid green for danger and reward. They sit far apart in lightness (dark, middle, light), so foes and stars stand apart from the hero and the walls without relying on hue. A blocky arcade pixel font.
 - Wells are stacked from hand-made chunks, picked by a seed, so every chunk is built to be passable whatever sits above and below it. Blocks are now and then cracked or chipped.
-- The page opens on the title. The pause menu has Resume, Sound and End the run.
+- The page opens on the title. The pause menu has Continue, Settings, Restart and Quit to title; the last two ask first. Leaving the tab mid-run pauses it.
+- Every control works on keyboard, mouse, gamepad and touch (a stick, BONK and pause on screen). It installs to a phone's home screen and opens full screen.
