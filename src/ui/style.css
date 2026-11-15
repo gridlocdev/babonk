@@ -74,7 +74,6 @@ body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; 
 .row-btns { display: flex; gap: 12px; }
 .row-btns .btn { min-width: 7em; }
 #fps { position: fixed; z-index: 60; pointer-events: none; top: calc(6px + env(safe-area-inset-top, 0px)); left: calc(6px + env(safe-area-inset-left, 0px)); padding: 1px 5px; font: 700 12px var(--ui); color: var(--mint); background: #0b0f1ecc; }
-#debug { position: fixed; z-index: 70; pointer-events: none; bottom: 8px; left: 8px; padding: 2px 6px; font: 12px ui-monospace, Menlo, monospace; color: #8f8; background: rgba(0, 0, 0, .8); white-space: pre; }
 
 /* ---- settings: a volume slider is a row of label, bar and value; a drag along the bar sets it */
 .col.settings { min-width: min(420px, 92vw); }

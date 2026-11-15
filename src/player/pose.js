@@ -1,6 +1,6 @@
 // Which animation the hero shows, and how far into it, from the run's state: a pure function of the player and the
 // run clock, so the zoo, the game and the tests agree. Times come from the sim (landAt, bounceAt, hurtAt, dash.t).
-export const POSE = { hurt: .3, smear: .05, squash: .07, runSpeed: 10 };
+const POSE = { hurt: .3, smear: .05, squash: .07, runSpeed: 10 };
 
 export function heroPose(p, now)
 {

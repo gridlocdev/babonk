@@ -18,8 +18,8 @@
 //             default when that media query matches (env passed to mergeSettings)
 //   reload    true when the change only takes effect after a reload; the screen says so beside the row
 
-export const GROUPS = ['difficulty', 'audio', 'controls', 'display', 'a11y'];
-export const GROUP_LABELS = {
+const GROUPS = ['difficulty', 'audio', 'controls', 'display', 'a11y'];
+const GROUP_LABELS = {
     difficulty: 'Difficulty', audio: 'Audio', controls: 'Controls', display: 'Display', a11y: 'Accessibility',
 };
 
@@ -29,7 +29,7 @@ const toggle = (id, label, def, extra = {})=> ({ id, group: id.split('.')[0], ty
 const choice = (id, label, options, def, extra = {})=>
     ({ id, group: id.split('.')[0], type: 'choice', label, options, default: def, ...extra });
 
-export const SETTINGS = [
+const SETTINGS = [
     // a game with its own presets replaces options with defineSettings (balance lives in the game, not here)
     choice('difficulty.preset', 'Difficulty', [
         { value: 'relaxed', label: 'Relaxed', help: 'More health, slower enemies, no fail states that cost progress.' },
@@ -78,31 +78,36 @@ export const SETTINGS = [
 ];
 
 // ids that changed name: old saves are read through this, so renaming never resets a player's choice
-export const RENAMED = {};
+const RENAMED = {};
 
 // a game's own copy of the table: drop settings it can't support, change defaults or options, add its own entries
-// (ids still '<group>.<name>' in one of GROUPS). Never edits SETTINGS itself.
+// (ids still '<group>.<name>' in one of GROUPS). Never edits SETTINGS itself. Throws on an entry that isn't well
+// formed: an unknown group, an id outside its group, or a default that isn't a valid value.
 export function defineSettings({ remove = [], change = {}, add = [] } = {}, base = SETTINGS)
 {
     const out = base.filter((s)=> !remove.includes(s.id)).map((s)=> (change[s.id] ? { ...s, ...change[s.id] } : s));
     for (const s of add)
     {
-        if (!GROUPS.includes(s.group)) throw new Error(`setting ${s.id}: unknown group ${s.group}`);
         if (out.some((o)=> o.id === s.id)) throw new Error(`setting ${s.id} already exists`);
         out.push(s);
+    }
+    for (const s of out)
+    {
+        if (!GROUPS.includes(s.group) || s.id.split('.')[0] !== s.group) throw new Error(`setting ${s.id}: unknown group ${s.group}`);
+        for (const v of [s.default, ...Object.values(s.system ?? {})]) if (clean(s, v) !== v) throw new Error(`setting ${s.id}: ${v} is not a valid value`);
     }
     return out;
 }
 
 // the default for this player: the system's preference (reduced motion, more contrast) where the entry has one
-export function defaultOf(entry, env = {})
+function defaultOf(entry, env = {})
 {
     for (const [flag, value] of Object.entries(entry.system ?? {})) if (env[flag]) return value;
     return entry.default;
 }
 
 // a valid value for the entry, or undefined: ranges clamp and snap to the step, choices must be an option
-export function clean(entry, value)
+function clean(entry, value)
 {
     if (entry.type === 'toggle') return typeof value === 'boolean' ? value : undefined;
     if (entry.type === 'choice') return entry.options.some((o)=> o.value === value) ? value : undefined;

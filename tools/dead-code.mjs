@@ -19,7 +19,7 @@ const args = process.argv.slice(2);
 const root = path.resolve(args.find(a => !a.startsWith('--')) ?? '.');
 const json = args.includes('--json');
 
-const SKIP = new Set(['node_modules', 'release', 'dist', 'templates']);
+const SKIP = new Set(['node_modules', 'release', 'dist', 'templates', 'shots']);
 function walk(dir)
 {
     const out = [];

@@ -1,4 +1,4 @@
-// Web Audio: sounds baked once from code (sfx-defs.js, and each game's own through define()).
+// Web Audio: sounds baked once from code (sfx-defs.js).
 // Browsers keep audio off until the first key or tap, so everything starts then.
 //
 // The mix: effects → their bus (EFFECTS_LEVEL × Effects volume) → a compressor ┐
@@ -20,7 +20,6 @@ let ctx = null, master = null, effectsBus = null, masterGain = null, musicBus = 
 const enabled = !FLAGS.mute;
 const buffers = {}, last = {};
 // baked sounds a game brings along: { name: def }, in the same form as SFX_DEFS
-const defs = {};
 
 function start()
 {
@@ -43,7 +42,6 @@ function start()
     musicBus.connect(masterGain);
     applyAll(true);
     for (const [name, def] of Object.entries(SFX_DEFS)) bake(name, def);
-    for (const [name, def] of Object.entries(defs)) bake(name, def);
 }
 
 function applyAll(now = false)
@@ -82,15 +80,9 @@ export const sfx = {
     // the context and where music goes, once audio has started; null before the first key or tap
     get context() { return ctx; },
     get musicOut() { return musicBus; },
-    // a game's own baked sound, made when audio starts
-    define(name, def)
-    {
-        defs[name] = def;
-        if (ctx) bake(name, def);
-    },
     play(name, volume = 1, pitch = 1)
     {
-        const def = SFX_DEFS[name] ?? defs[name], buf = buffers[name];
+        const def = SFX_DEFS[name], buf = buffers[name];
         if (!def || !buf || !enabled) return;
         const now = ctx.currentTime;
         if (now - (last[name] ?? -9) < (def.gap ?? .03)) return;

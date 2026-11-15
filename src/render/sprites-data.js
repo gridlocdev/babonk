@@ -345,7 +345,7 @@ export const ANIMS = {
 export const HERO_ANIMS = ['idle', 'run', 'squash', 'rise', 'fall', 'hurt', 'ball', 'smearV', 'smearH'];
 
 // the plain block most of the time, a cracked or chipped one now and then, always the same one at the same tile
-export const BLOCKS = ['block', 'block', 'block', 'block', 'block', 'block1', 'block', 'block', 'block2', 'block'];
+const BLOCKS = ['block', 'block', 'block', 'block', 'block', 'block1', 'block', 'block', 'block2', 'block'];
 export function blockAt(tx, ty)
 {
     const h = Math.imul(tx * 374761393 + ty * 668265263, 1274126177) >>> 0;

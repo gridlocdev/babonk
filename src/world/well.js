@@ -62,7 +62,7 @@ export function fill(well, tx0, tx1, ty, t) { for (let tx = tx0; tx <= tx1; tx++
 export function clearWell(well) { for (let ty = 0; ty < well.rows; ty++) fill(well, 1, COLS - 2, ty, EMPTY); }
 
 // the first solid tile a box (x, y, w, h) overlaps, or null
-export function hitTile(well, x, y, w, h)
+function hitTile(well, x, y, w, h)
 {
     const x0 = Math.floor(x / TILE), x1 = Math.floor((x + w - 1e-6) / TILE);
     const y0 = Math.floor(y / TILE), y1 = Math.floor((y + h - 1e-6) / TILE);

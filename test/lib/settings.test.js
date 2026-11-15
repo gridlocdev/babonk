@@ -1,24 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-    SETTINGS, GROUPS, defineSettings, mergeSettings, changedSettings, setSetting, stepSetting, resetGroup,
-    visibleSettings, formatSetting, clean,
+    defineSettings, mergeSettings, changedSettings, setSetting, stepSetting, resetGroup, visibleSettings, formatSetting,
 } from '../../src/lib/settings.js';
+
+const SETTINGS = defineSettings();      // the whole standard table
+const GROUPS = ['difficulty', 'audio', 'controls', 'display', 'a11y'];
 
 const byId = (id)=> SETTINGS.find((s)=> s.id === id);
 
 test('every entry is well formed: unique ids in a known group, defaults valid', ()=>
 {
-    const ids = new Set();
-    for (const s of SETTINGS)
-    {
-        assert.ok(!ids.has(s.id), `duplicate ${s.id}`);
-        ids.add(s.id);
-        assert.ok(GROUPS.includes(s.group), s.id);
-        assert.equal(s.id.split('.')[0], s.group, s.id);
-        assert.equal(clean(s, s.default), s.default, `${s.id} default is not a valid value`);
-        for (const v of Object.values(s.system ?? {})) assert.equal(clean(s, v), v, `${s.id} system default`);
-    }
+    assert.equal(new Set(SETTINGS.map((s)=> s.id)).size, SETTINGS.length);
+    // defineSettings checks the rest, for the standard table and for a game's own changes
+    assert.throws(()=> defineSettings({ change: { 'audio.music': { default: 2 } } }), /not a valid value/);
+    assert.throws(()=> defineSettings({ change: { 'a11y.plainFont': { default: 'yes' } } }), /not a valid value/);
+    assert.throws(()=> defineSettings({ add: [{ id: 'cheats.fly', group: 'cheats', type: 'toggle', default: false }] }), /unknown group/);
+    assert.throws(()=> defineSettings({ add: [{ id: 'audio.music', group: 'audio', type: 'toggle', default: false }] }), /already exists/);
 });
 
 test('saved changes override the defaults; bad and unknown values are dropped', ()=>

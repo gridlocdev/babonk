@@ -20,7 +20,7 @@ export const SCHEMA = defineSettings({
         'a11y.textScale', 'a11y.subtitles', 'a11y.captions', 'a11y.highContrast', 'a11y.plainFont',
     ],
 });
-export const TAGS = ['gamepad'];
+const TAGS = ['gamepad'];
 
 const media = (q)=> globalThis.matchMedia?.(q).matches ?? false;
 const env = { reducedMotion: media('(prefers-reduced-motion: reduce)'), moreContrast: media('(prefers-contrast: more)') };
@@ -41,7 +41,6 @@ export function loadSettings()
 }
 /** @param {string} id */
 export const setting = (id)=> values[id];
-export const allSettings = ()=> values;
 /** the settings screen's tabs and rows */
 export const settingTabs = ()=> visibleSettings(SCHEMA, TAGS);
 

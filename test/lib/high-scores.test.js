@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { insertScore, nextLetter, qualifies, sanitize, topScore } from '../../src/lib/high-scores.js';
+import { insertScore, nextLetter, qualifies, topScore } from '../../src/lib/high-scores.js';
 
 test('the high-score table keeps the top ten, three letters each', ()=>
 {
@@ -13,7 +13,7 @@ test('the high-score table keeps the top ten, three letters each', ()=>
     assert.equal(t[0].name, 'ABA');
     assert.ok(!qualifies(t, 300));
     assert.ok(qualifies(t, 301));
-    assert.equal(sanitize('x'), 'XAA');
+    assert.equal(insertScore([], 'x1', 5)[0].name, 'XAA', 'names are three capital letters');
     assert.equal(nextLetter('A', -1), 'Z');
     assert.equal(nextLetter('Z', 1), 'A');
 });

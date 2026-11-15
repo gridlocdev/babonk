@@ -6,7 +6,7 @@ import { BLOCK, CRATE, SPIKES, setTile } from '../../src/world/well.js';
 import { nextWell, step } from '../../src/world/run.js';
 import { lockTarget } from '../../src/player/hero.js';
 import { HERO } from '../../src/player/hero-data.js';
-import { heroPose, POSE } from '../../src/player/pose.js';
+import { heroPose } from '../../src/player/pose.js';
 import { ANIMS, HERO_ANIMS, SPRITES } from '../../src/render/sprites-data.js';
 import { DT, foe, idle, newRun, open, press, said } from '../run-helpers.js';
 
@@ -106,5 +106,5 @@ test('the hero poses follow the run: idle, run, squash on landing, smear then a 
     for (let i = 0; i < 4; i++) step(k, DT, idle);
     assert.equal(heroPose(k.player, k.t)[0], 'ball');
     k.player.hurtAt = k.t;
-    assert.equal(heroPose(k.player, k.t + POSE.hurt / 2)[0], 'hurt');
+    assert.equal(heroPose(k.player, k.t + .1)[0], 'hurt', 'just after a hit');
 });

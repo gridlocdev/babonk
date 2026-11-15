@@ -3,7 +3,7 @@
 import { HERO } from '../player/hero-data.js';
 import { GRAVITY, TILE } from '../world/wells-data.js';
 
-export const EASY = .8;
+const EASY = .8;
 const air = 2 * HERO.jumpV / GRAVITY;          // seconds from a full jump back down to the same height
 
 export const REACH = {

@@ -1,8 +1,8 @@
 // A high-score table: the top ten, three letters each, as plain data a save can hold.
-export const TABLE_SIZE = 10;
+const TABLE_SIZE = 10;
 export const topScore = (table)=> table[0]?.score ?? 0;
 export const qualifies = (table, score)=> score > 0 && (table.length < TABLE_SIZE || score > table[table.length - 1].score);
-export const sanitize = (name)=> (String(name ?? '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3)).padEnd(3, 'A');
+const sanitize = (name)=> (String(name ?? '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3)).padEnd(3, 'A');
 // a new table with the score in its place, or the same table if it doesn't make the ten
 export function insertScore(table, name, score)
 {

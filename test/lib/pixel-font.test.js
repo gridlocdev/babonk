@@ -1,21 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CELL, FONT, measure, pixels } from '../../src/lib/pixel-font.js';
+import { CELL, measure, pixels } from '../../src/lib/pixel-font.js';
 
-test('every glyph is a clean grid that fits the cell', ()=>
+const NEEDED = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,·!?:^-/\'()+<>';
+
+test('every glyph a game screen needs is drawn, inside its width and the cell', ()=>
 {
-    for (const [ch, g] of Object.entries(FONT))
+    const unknown = JSON.stringify(pixels('?'));
+    for (const ch of NEEDED)
     {
-        assert.ok(g.rows.length === 7 || g.rows.length === 8, `${ch} has 7 or 8 rows`);
-        assert.ok(g.rows.length + 1 <= CELL);
-        for (const r of g.rows) assert.match(r, new RegExp(`^[#.]{${g.w}}$`), `${ch} rows are all ${g.w} wide`);
+        const px = pixels(ch), w = measure(ch);
+        if (ch !== ' ' && ch !== '?') assert.notEqual(JSON.stringify(px), unknown, `missing ${ch}`);
+        for (const [x, y] of px) assert.ok(x >= 0 && x < w && y >= 1 && y < CELL, `${ch} pixel (${x}, ${y})`);
     }
-});
-
-test('the letters, digits and marks a game screen needs are all there', ()=>
-{
-    const needed = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,·!?:^-/\'()+<>';
-    for (const ch of needed) assert.ok(FONT[ch], `missing ${ch}`);
 });
 
 test('lines are measured with one pixel between letters', ()=>

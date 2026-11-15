@@ -49,7 +49,6 @@ for (const [ch, s] of Object.entries(G))
     const rows = s.split('/');
     glyphs[ch] = { w: rows[0].length, rows };
 }
-export const FONT = glyphs;
 const blank = glyphs['?'];
 
 const glyph = (ch)=> glyphs[ch] ?? blank;

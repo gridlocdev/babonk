@@ -4,11 +4,10 @@ import { addRunPart, say } from '../../world/run.js';
 import { BLOCK, fill } from '../../world/well.js';
 import { COLS, TILE } from '../../world/wells-data.js';
 import { lockTarget, placeHero } from '../../player/hero.js';
-import { chainBonus } from './chain-data.js';
+import { CHAIN, chainBonus } from './chain-data.js';
 
 const part = {
-    enter(w) { w.bestChain = 0; },
-    bounced(w, { kill }) { if (kill) { w.chain++; w.bestChain = Math.max(w.bestChain, w.chain); } },
+    bounced(w, { kill }) { if (kill) w.chain++; },
     hurt(w) { w.chain = 0; },
     landed(w)
     {
@@ -24,7 +23,7 @@ function museum()
 {
     return [{
         id: 'chain', title: 'The chain', file: 'src/features/chain/index.js',
-        text: 'Each kill you bounce off adds one to the chain. Landing pays for a chain of 3 or more; a hit ends it.',
+        text: `Each kill you bounce off adds one to the chain. Landing pays for a chain of ${CHAIN.min} or more; a hit ends it.`,
         start(w)
         {
             fill(w, 1, COLS - 2, 22, BLOCK);
