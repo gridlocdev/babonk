@@ -28,7 +28,7 @@ Run both after every change:
 
 ```bash
 just check   # syntax, layer rules (tools/coupling-report.mjs, architecture.json) and types (jsconfig.json)
-just test    # unit tests for lib/, *-data.js, the sim and the rules
+just test    # tests for lib/, *-data.js, the world and hero, and each feature through its contract
 ```
 
 ## Debug flags

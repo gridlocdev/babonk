@@ -36,6 +36,7 @@ tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the
 - Features don't import each other. They talk through `game/events.js` or a registry (`addRunPart` in `world/run.js`, `addRunLayer` in `render/view.js`).
 - A feature owns its save slice and its `*-data.js`.
 - `lib/` and `*-data.js` import no engine or DOM code and have tests. So do `world/` and `player/`, which run in node.
+- Each feature has its own test file in `test/features/`, which builds it with the real `game/` modules (over `test/fake-browser.js`, a do-nothing DOM), plays like the player (a run's controls, or keys and the touch button for the run feature) and checks what the rest of the game sees: the run's score, hp and sounds, the `debug()` hook and the saved slice. A test imports a feature's `index.js` and data, never its other files. The `game/` modules keep their state at module level, so one file covers one feature.
 - A new feature goes in `src/features/<name>/` and is registered in `src/features/index.js`.
 
 ## Checking
