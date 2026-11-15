@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CELL, measure, pixels } from '../../src/lib/pixel-font.js';
 
-const NEEDED = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,·!?:^-/\'()+<>';
+const NEEDED = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,·!?:^-/\'()+<>%';
 
 test('every glyph a game screen needs is drawn, inside its width and the cell', ()=>
 {

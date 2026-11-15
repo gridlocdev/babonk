@@ -11,14 +11,6 @@ body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; 
 /* the game's screen: platform/engine.js sizes and centres it on whole device pixels; this keeps its pixels square */
 #game { position: absolute; display: block; image-rendering: pixelated; }
 
-/* ---- cards over the screen: the settings screen (the pause menu and the initials are drawn on the canvas) */
-#screen { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 2vh, 20px); padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(12px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; touch-action: pan-y; }
-#screen.dim { background: #0b0f1ee0; }
-.banner { font: 800 clamp(36px, 9vmin, 88px)/1 var(--ui); letter-spacing: .08em; color: var(--accent); text-shadow: .06em .06em 0 #000; }
-.btn { all: unset; cursor: pointer; box-sizing: border-box; padding: 9px 22px; min-height: 42px; background: var(--ground); border: 3px solid var(--mint); color: var(--mint); font: 700 clamp(14px, 2.2vmin, 18px) var(--ui); letter-spacing: .06em; text-align: center; text-transform: uppercase; }
-.btn.focus { background: var(--mint); color: var(--ground); }
-.col { display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: min(320px, 86vw); }
-
 /* ---- touch: a stick bottom left, the hold button bottom right, pause top right */
 #touch { position: fixed; inset: 0; z-index: 25; pointer-events: none; }
 #stick { position: absolute; left: calc(14px + env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: clamp(110px, 34vmin, 160px); aspect-ratio: 1; border-radius: 50%; border: 3px solid #dcefe266; background: #0b0f1e99; pointer-events: auto; touch-action: none; }
@@ -39,77 +31,3 @@ body { position: fixed; inset: 0; -webkit-user-select: none; user-select: none; 
 #room b.easy { color: #8f8; } #room b.hard { color: #f4a23c; } #room b.no { color: #f66; text-decoration: line-through; }
 #room .wrong { color: #f66; font-weight: 700; }
 #room .file, #room .keys { opacity: .7; }
-
-/* ---- settings: tabs, then a row per setting (label left, value right, a bar for a range), then the help line */
-.set-banner { font-size: clamp(28px, 6vmin, 56px); }
-.tabs { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
-.tab { all: unset; cursor: pointer; padding: 6px 12px; border: 2px solid transparent; color: var(--mint); opacity: .65; font: 700 clamp(12px, 2vmin, 16px) var(--ui); letter-spacing: .06em; text-transform: uppercase; }
-.tab[aria-selected="true"] { opacity: 1; border-bottom-color: var(--accent); }
-.tab.focus { opacity: 1; background: var(--mint); color: var(--ground); }
-.tab-key { font: 700 11px var(--ui); padding: 2px 5px; border: 1px solid #dcefe288; color: #dcefe2bb; }
-.col.settings { min-width: min(460px, 92vw); }
-.row { display: flex; align-items: center; gap: 16px; text-align: left; text-transform: none; touch-action: none; }
-.r-label { flex: 0 1 12em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row:not([role="slider"]) .r-label { flex: 1 1 auto; }     /* no bar to line up with: the label takes the room */
-.r-bar { flex: 1 1 120px; position: relative; min-width: 60px; height: 12px; border: 2px solid currentColor; }
-.r-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
-.r-val { flex: 0 0 3.6em; margin-left: auto; text-align: right; }
-/* a phone: a range's bar goes on its own line under the label and value, so labels are never cut */
-@media (max-width: 520px) {
-  .row { flex-wrap: wrap; row-gap: 6px; }
-  .r-label { flex: 1 1 auto; white-space: normal; }
-  .row[role="slider"] .r-bar { order: 3; flex: 1 1 100%; }
-}
-.help { min-height: 1.4em; max-width: min(460px, 92vw); text-align: center; font: 400 clamp(12px, 1.9vmin, 15px) var(--ui); opacity: .85; }
-#fps { position: fixed; z-index: 60; pointer-events: none; top: calc(6px + env(safe-area-inset-top, 0px)); left: calc(6px + env(safe-area-inset-left, 0px)); padding: 1px 5px; font: 700 12px var(--ui); color: var(--mint); background: #0b0f1ecc; }
-#debug { position: fixed; z-index: 70; pointer-events: none; bottom: 8px; left: 8px; padding: 2px 6px; font: 12px ui-monospace, Menlo, monospace; color: #8f8; background: rgba(0, 0, 0, .8); white-space: pre; }
-/* the dev rooms' sign (?debug&room=gym | museum): what the row or exhibit shows, its cases and its file */
-#room { position: fixed; z-index: 60; pointer-events: none; bottom: 8px; right: 8px; width: min(300px, 40vw); padding: 8px 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #dcefe2; background: rgba(0, 0, 0, .8); }
-#room h2 { margin: 0 0 4px; font-size: 13px; color: #f4a23c; }
-#room p { margin: 4px 0; }
-#room ul { margin: 4px 0; padding-left: 16px; }
-#room li.on { color: #fff; font-weight: 700; }
-#room li.on::marker { content: '▶ '; }
-#room b.easy { color: #8f8; } #room b.hard { color: #f4a23c; } #room b.no { color: #f66; text-decoration: line-through; }
-#room .wrong { color: #f66; font-weight: 700; }
-#room .file, #room .keys { opacity: .7; }
-
-/* ---- settings: tabs, then a row per setting (label left, value right, a bar for a range), then the help line */
-.set-banner { font-size: clamp(28px, 6vmin, 56px); }
-.tabs { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
-.tab { all: unset; cursor: pointer; padding: 6px 12px; border: 2px solid transparent; color: var(--mint); opacity: .65; font: 700 clamp(12px, 2vmin, 16px) var(--ui); letter-spacing: .06em; text-transform: uppercase; }
-.tab[aria-selected="true"] { opacity: 1; border-bottom-color: var(--accent); }
-.tab.focus { opacity: 1; background: var(--mint); color: var(--ground); }
-.tab-key { font: 700 11px var(--ui); padding: 2px 5px; border: 1px solid #dcefe288; color: #dcefe2bb; }
-.col.settings { min-width: min(460px, 92vw); }
-.row { display: flex; align-items: center; gap: 16px; text-align: left; text-transform: none; touch-action: none; }
-.r-label { flex: 0 1 12em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row:not([role="slider"]) .r-label { flex: 1 1 auto; }     /* no bar to line up with: the label takes the room */
-.r-bar { flex: 1 1 120px; position: relative; min-width: 60px; height: 12px; border: 2px solid currentColor; }
-.r-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
-.r-val { flex: 0 0 3.6em; margin-left: auto; text-align: right; }
-/* a phone: a range's bar goes on its own line under the label and value, so labels are never cut */
-@media (max-width: 520px) {
-  .row { flex-wrap: wrap; row-gap: 6px; }
-  .r-label { flex: 1 1 auto; white-space: normal; }
-  .row[role="slider"] .r-bar { order: 3; flex: 1 1 100%; }
-}
-.help { min-height: 1.4em; max-width: min(460px, 92vw); text-align: center; font: 400 clamp(12px, 1.9vmin, 15px) var(--ui); opacity: .85; }
-/* a confirmation: the question, then No and Yes side by side */
-.ask { max-width: min(420px, 90vw); text-align: center; font: 700 clamp(16px, 3vmin, 24px) var(--ui); }
-.row-btns { display: flex; gap: 12px; }
-.row-btns .btn { min-width: 7em; }
-#fps { position: fixed; z-index: 60; pointer-events: none; top: calc(6px + env(safe-area-inset-top, 0px)); left: calc(6px + env(safe-area-inset-left, 0px)); padding: 1px 5px; font: 700 12px var(--ui); color: var(--mint); background: #0b0f1ecc; }
-
-/* ---- settings: a volume slider is a row of label, bar and value; a drag along the bar sets it */
-.col.settings { min-width: min(420px, 92vw); }
-.slider { display: flex; align-items: center; gap: 20px; text-align: left; touch-action: none; }
-.s-label { flex: 0 0 5.6em; }
-.s-track { flex: 1; position: relative; min-width: 80px; height: 14px; border: 2px solid currentColor; }
-.s-track i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
-.s-num { flex: 0 0 3.2ch; text-align: right; }
-.slider.off .s-num { opacity: .7; }
-/* the focused slider shows that left and right move it; the gap leaves room, so focus never shifts the bar */
-.slider.focus .s-track::before, .slider.focus .s-track::after { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11px; }
-.slider.focus .s-track::before { content: '◀'; left: -14px; }
-.slider.focus .s-track::after { content: '▶'; right: -14px; }

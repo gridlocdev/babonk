@@ -1,15 +1,17 @@
-// Menus drawn on the 320 × 180 screen in the pixel font, over the frozen game: the pause menu, its questions and the
-// high-score initials. show() takes rows of items, each { x, y, w, h, pick?, adjust? } in screen pixels, and a
-// draw(g, t) for the whole menu, with t the seconds since it opened; ui/menu-nav.js moves the focus with keys and a
-// pad, and a mouse or finger on the screen focuses and picks the item under it. Call update() each step and draw(g)
-// after the frame. The helpers below draw the parts in the three colours set in look.
+// Menus drawn on the 320 × 180 screen in the pixel font, over the frozen game: the pause menu, its questions, the
+// settings and the high-score initials. show() takes rows of items, each { x, y, w, h, pick?, adjust?, drag? } in
+// screen pixels, and a draw(g, t) for the whole menu, with t the seconds since it opened; ui/menu-nav.js moves the
+// focus with keys and a pad, and a mouse or finger on the screen focuses and picks the item under it. An item with
+// drag(x, phase) is offered every press on it first: returning true there ('down') takes the pointer, and its moves
+// and its release ('move', 'up') go to drag instead of picking. Call update() each step and draw(g) after the frame.
+// The helpers below draw the parts in the three colours set in look.
 import { clearPresses } from '../platform/input.js';
 import { menuNav } from './menu-nav.js';
 import { pixelCentre, pixelText, pixelWidth } from './pixel-text.js';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const nav = menuNav();
-let paint = null, t = 0, pressed = null, canvas = null;
+let paint = null, t = 0, pressed = null, dragging = null, canvas = null;
 
 // ink: words and buttons, accent: banners, ground: the dark behind them
 export const look = { ink: '#fff', accent: '#fff', ground: '#000' };
@@ -18,13 +20,19 @@ export const pixelMenu = {
     get open() { return !!nav.rows; },
     /** the focused item */
     get focus() { return nav.focus; },
-    // rows of items, the menu's draw(g, t), and focus, back(), move(item, how) as in ui/menu-nav.js
-    show(rows, draw, opts = {})
+    /** the focused row's index */
+    get focusRow() { return nav.ry; },
+    // rows of items, the menu's draw(g, t), and focus, back(), move(item, how), tick() as in ui/menu-nav.js; again
+    // keeps the clock running, for the same menu redrawn with new items (a settings tab)
+    /** @param {{ again?: boolean, focus?: number[], back?: (() => void) | null, move?: ((it: any, how: string) => void) | null, tick?: (() => boolean) | null }} [o] */
+    show(rows, draw, o = {})
     {
-        paint = draw; t = 0; pressed = null;
+        const { again = false, ...opts } = o;
+        paint = draw; pressed = dragging = null;
+        if (!again) t = 0;
         nav.set(rows, opts);
     },
-    hide() { nav.clear(); paint = null; pressed = null; },
+    hide() { nav.clear(); paint = null; pressed = dragging = null; },
     update() { nav.update(); },
     draw(g, dt)
     {
@@ -50,17 +58,40 @@ function at(e)
         }
     return null;
 }
-addEventListener('pointermove', (e)=> { if (nav.rows && e.pointerType === 'mouse') { const h = at(e); if (h) nav.take(h.ry, h.rx); } });
+const screenX = (e)=> { const r = canvas.getBoundingClientRect(); return (e.clientX - r.left) * canvas.width / r.width; };
+addEventListener('pointermove', (e)=>
+{
+    if (!nav.rows) return;
+    if (dragging) { if (e.pointerId === dragging.id) dragging.it.drag(screenX(e), 'move'); return; }
+    if (e.pointerType === 'mouse') { const h = at(e); if (h) nav.take(h.ry, h.rx); }
+});
 addEventListener('pointerdown', (e)=>
 {
     if (!nav.rows) return;
     const h = at(e);
     pressed = h?.it ?? null;
-    if (h) nav.take(h.ry, h.rx, '');
+    if (!h) return;
+    nav.take(h.ry, h.rx, '');
+    if (h.it.drag?.(screenX(e), 'down'))
+    {
+        dragging = { id: e.pointerId, it: h.it };
+        pressed = null;
+        canvas.setPointerCapture?.(e.pointerId);
+        clearPresses();
+    }
 });
+const letGo = (e)=>
+{
+    if (!dragging || e.pointerId !== dragging.id) return false;
+    const { it } = dragging;
+    dragging = null;
+    it.drag(screenX(e), 'up');
+    return true;
+};
+addEventListener('pointercancel', letGo);
 addEventListener('pointerup', (e)=>
 {
-    if (!nav.rows || !pressed) return;
+    if (!nav.rows || letGo(e) || !pressed) return;
     const h = at(e), it = pressed;
     pressed = null;
     if (h?.it !== it) return;

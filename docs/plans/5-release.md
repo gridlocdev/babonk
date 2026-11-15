@@ -27,7 +27,7 @@ Next: the play-tests below, then whatever they turn up.
 - [ ] **The colours and the star shower**: [http://localhost:8141/?debug&mute&shot=bot](http://localhost:8141/?debug&mute&shot=bot): blue-black, mint and a mid green, with stars knocked out of foes. Does the darker green still feel lively? In gray they should separate: [http://localhost:8141/?debug&mute&shot=zoo&view=gray](http://localhost:8141/?debug&mute&shot=zoo&view=gray).
 - [ ] **The hero's animations**: [http://localhost:8141/?debug&mute&room=zoo](http://localhost:8141/?debug&mute&room=zoo): idle with a blink, a 4-frame run, squash on landing and bouncing, rise, fall, hurt, a spinning ball and a smear as a dash leaves; 2-frame walks and flaps for the foes, and twinkling stars.
 - [ ] **A full run after the code split**: [http://localhost:8141](http://localhost:8141): three wells to the end and a high score. It should play, look and sound exactly as v1.0.2.
-- [ ] **The pause menu and initials in the pixel font**: [http://localhost:8141/?debug&mute&shot=pause](http://localhost:8141/?debug&mute&shot=pause) and [http://localhost:8141/?debug&mute&shot=initials](http://localhost:8141/?debug&mute&shot=initials). Move with the keys, a pad, the mouse and, on a phone (`just lan`), a finger: Restart and Quit ask first, the arrows turn the letters. Do the buttons read at a glance, are the arrows big enough to tap, and is the dimmed well behind still the right amount?
+- [ ] **The menus in the pixel font**: [the pause menu](http://localhost:8141/?debug&mute&shot=pause), [settings](http://localhost:8141/?debug&mute&shot=settings) and [the initials](http://localhost:8141/?debug&mute&shot=initials). Move with the keys, a pad, the mouse and, on a phone (`just lan`), a finger: Restart and Quit ask first, the arrows turn the letters, the settings bars drag. Do the buttons read at a glance, are the rows, bars and arrows big enough to tap on a phone, and is the dimmed game behind still the right amount?
 - [ ] **The home-screen icon**: [http://localhost:8141/icons/icon-512.png](http://localhost:8141/icons/icon-512.png): the hero rising, on the ground colour. Does it read at phone-icon size?
 
 ### To hear
@@ -41,11 +41,10 @@ Next: the play-tests below, then whatever they turn up.
 ## Slices
 
 - [x] 1. Title music in 3/4: the hook squeezed to three beats a bar over the same chords, rendered to `music/title.mp3` (answered question 2).
-- [x] 2. Pause menu, its questions and the initials drawn on the 320 × 180 screen in the pixel font, to match the HUD (answered question 3): `ui/pixel-menu.js`, sharing its key and pad movement with the settings cards (`ui/menu-nav.js`). Keys, mouse and a finger checked headless.
+- [x] 2. Pause menu, its questions, settings and the initials drawn on the 320 × 180 screen in the pixel font, to match the HUD (answered question 3): `ui/pixel-menu.js` and `ui/menu-nav.js`. Keys, mouse and a finger (bars dragged too) checked headless.
 
 ## Follow-ups
 
-- [ ] Settings is still HTML cards over the canvas, now the only screen not in the pixel font. Drawing it on the canvas too means sliders, tabs and a list that scrolls in 180 pixels; worth it if the mismatch shows in play.
 - [ ] On the title, the touch pause button opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/settings.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
 - [ ] More chunks: Babonk has 13. A few more per well, some with a new idea (moving blocks, crumbling ledges), would keep runs from repeating. A new idea goes in the museum and gym first.

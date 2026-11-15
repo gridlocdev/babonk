@@ -6,7 +6,6 @@ import { insertScore, qualifies, topScore } from '../../lib/high-scores.js';
 import { sfx } from '../../audio/sfx.js';
 import { musicCutIn, setMusicArea, setMusicDuck } from '../../audio/music.js';
 import { setting } from '../../game/settings.js';
-import { cards } from '../../ui/cards.js';
 import { showInitials } from '../../ui/initials.js';
 import { banner, button, dim, look, panel, pixelMenu } from '../../ui/pixel-menu.js';
 import { pixelCentre } from '../../ui/pixel-text.js';
@@ -91,11 +90,9 @@ function openSettings(from)
     setMode('settings');
     touch.show(false);
     showSettings({
-        color: PALETTE.O,
         sound: (what)=> sfx.play(what === 'move' ? 'uiMove' : what === 'pick' ? 'uiPick' : 'star'),
         close()
         {
-            cards.hide();
             if (settingsFrom === 'paused') { showPause(1); return; }
             controls(); setMode('menu');
         },
@@ -227,8 +224,7 @@ export default {
     {
         modeTime += dt;
         if (mode === 'zoo' || mode === 'room') return;
-        if (mode === 'paused' || mode === 'initials') { pixelMenu.update(); return; }
-        if (mode === 'settings') { cards.update(); return; }
+        if (mode === 'paused' || mode === 'settings' || mode === 'initials') { pixelMenu.update(); return; }
         if (mode === 'menu')
         {
             if (modeTime < .2) return;

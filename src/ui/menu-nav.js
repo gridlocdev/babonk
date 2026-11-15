@@ -1,7 +1,7 @@
 // Moving a focus through rows of menu items with keys or a pad: one step per press, repeating while a direction is
 // held. An item is { pick?(), adjust?(dir) }; one with adjust is a slider, so left and right change it instead of
-// moving the focus. Confirm picks, Back calls back. ui/cards.js (HTML) and ui/pixel-menu.js (drawn on the screen)
-// each keep one and draw the focus their own way; moved() runs whenever the focus changes.
+// moving the focus. Confirm picks, Back calls back. ui/pixel-menu.js keeps one; moved() runs whenever the focus
+// changes.
 import { input } from '../platform/input.js';
 
 const REPEAT_DELAY = .38, REPEAT_EVERY = .07;   // seconds: holding a direction repeats it
