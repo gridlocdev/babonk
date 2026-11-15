@@ -2,7 +2,7 @@
 
 Babonk is a one-screen-wide pixel platformer down a vertical well. You fall, and you keep yourself up by bonking.
 
-![Babonk mid-run: the hero falls through a mint brick well, a green lock-on frame around the foe below it, with HP, bonk, chain, score and well depth beside the well.](images/babonk.webp)
+![Babonk in the third well: the hero dashes down through the air after a burst of stars, past green spikes on a ledge above, walker foes on a ledge below, a floater alerted with a "!", and crates, with a x8 chain in the HUD.](images/babonk.webp)
 
 ## Bonking
 

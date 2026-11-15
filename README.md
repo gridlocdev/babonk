@@ -2,7 +2,7 @@
 
 Fall down three wells in big three-colour pixels, and never touch the ground. Bonk in midair to home in on a foe, bounce off it, and keep the chain going for stars and points.
 
-![Babonk mid-run: a narrow well of pale mint brick walls on a blue-black ground. The hero falls between two ledges, a green lock-on frame around the foe just below it. On the left the HUD shows four HP squares, the bonk ready and a x2 chain; on the right the score of 110, well 1 of 3, and a depth gauge.](docs/images/babonk.webp)
+![Babonk mid-run in the third well: a narrow shaft of pale mint brick walls on a blue-black ground. The hero dashes diagonally down through the air, trailing a checkered streak, after breaking a foe that burst into stars. Above, rows of green spikes flank a short ledge dotted with stars and a horned floater hovers below it. On a lower ledge two walker foes stand among more stars, a floater below them shows a "!" as it spots the hero, and two crates sit near the bottom. The HUD shows one HP left of four, a x8 chain, a score of 730, well 3 of 3 and a depth gauge.](docs/images/babonk.webp)
 
 - **One button in the air.** Press **BONK** to home in on the nearest foe in reach, or dash the way you hold when none is.
 - **Bounce to stay up.** Foes, walls, floors and crates all bounce you back and give the bonk back; breaking foes and crates builds a chain.
