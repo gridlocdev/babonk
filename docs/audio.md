@@ -19,7 +19,7 @@ One home key (D), one motif (the hook's first bar, `1:0.5 5:0.5 8 7:0.5 5:0.5 3`
 
 | Track | Plays on | Keeps | Changes |
 |---|---|---|---|
-| `title` | the title | the hook, D dorian | 132 bpm, no drums, a 50% pulse over a pad; jumping in is the step up |
+| `title` | the title | the hook in 3/4, D dorian | 132 bpm, no drums, a 50% pulse over a pad; jumping in is the step up |
 | `well1` | well 1 | the hook, in 5/4 | D minor, 138 bpm, 25% pulses, triangle bass, a heavy NES-kit rock beat |
 | `well2` | well 2 | the motif, sequenced | D phrygian (flat 2nd), 150 bpm, PWM lead, rimclicks and low toms, snare saved for the hook |
 | `well3` | well 3 | the hook, in 5/4, angry | D harmonic minor, 162 bpm, DPCM bass and kit in double time, claps |

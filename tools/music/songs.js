@@ -9,13 +9,17 @@
 //   leads 80 pulse 25%, 82 thin pulse 12.5%, 83 hollow square, 84 PWM, 85 soft triangle, 86/87 NES pulse 25%/50%;
 //   46 pluck; 90 PWM pad; bass 38 NES triangle, 39 pulse, 33 DPCM; kits 0 chip, 1 NES, 2 DPCM.
 
-// The hook: a bounce up off the tonic, then a fall back down the well. Its first bar is the motif every track varies.
+// The bounce: up off the tonic, then a fall back down the well. The motif every track varies.
 const BOUNCE = '1:0.5 5:0.5 8 7:0.5 5:0.5 3';
-const HOOK = [
-    BOUNCE, '4:0.5 6:0.5 8 6:0.5 4:0.5 1', '5:0.5 3:0.5 5 8:0.5 7:0.5 5', '4:1.5 2:0.5 7,:2',
-    BOUNCE, '4:0.5 6:0.5 8 9:0.5 8:0.5 6', '5:0.5 7:0.5 9 7:0.5 5:0.5 2', '1:2 r:2',
-].join(' | ');
 const HOOK_CHORDS = 'i IV i VII i IV v i';
+
+// The hook in 3/4 for the title: each bar of it in three beats over the same chords, so the bounce turns into a
+// lilt; the wells then limp in 5/4 and 3/4.
+const BOUNCE3 = '1:0.5 5:0.5 8 7:0.5 5:0.5';
+const HOOK3 = [
+    BOUNCE3, '4:0.5 6:0.5 8 6:0.5 4:0.5', '5:0.5 3:0.5 5 8:0.5 7:0.5', '4:1.5 2:0.5 7,',
+    BOUNCE3, '4:0.5 6:0.5 8 9:0.5 8:0.5', '5:0.5 7:0.5 9 7:0.5 5:0.5', '1:2 r',
+].join(' | ');
 
 // D dorian (minor, with the bright raised 6th in IV), one tempo through the loop: push 0, as the game's bar grid needs
 const HOME = { sound: 'chip', key: 'D', mode: 'dorian', motif: BOUNCE, push: 0 };
@@ -144,17 +148,17 @@ const WELL3_DRUMS = {
 
 export const TRACKS = [
     {
-        // The title: the dark mouth of the well, the hero waiting at the top. The hook alone on a 50% pulse over a
-        // triangle, no drums yet, a little slower than the first well, so pressing start feels like jumping in.
+        // The title: the dark mouth of the well, the hero waiting at the top. The hook in 3/4 alone on a 50% pulse
+        // over a triangle, no drums yet, a little slower than the first well, so pressing start feels like jumping in.
         id: 'title', loop: [1, 3],
         spec: {
-            title: 'Babonk', ...HOME, emotion: 'hopeful', tempo: 132, groove: 'rock', comp: 'eighths', arp: 'tracker',
+            title: 'Babonk', ...HOME, motif: BOUNCE3, meter: '3/4', emotion: 'hopeful', tempo: 132, groove: 'rock', comp: 'eighths', arp: 'tracker',
             legato: 0.7, dynamics: 0.6,
             form: ['intro', 'A', 'B', 'A'],
             band: { lead: 87, counter: 85, arp: 82, chords: null, pad: 90, bass: 38, drums: null },
             sections: {
                 intro: { bars: 4, progression: 'i IV i IV', melody: false, energy: 0.35 },
-                A: { bars: 8, progression: HOOK_CHORDS, melody: HOOK, energy: 0.55 },
+                A: { bars: 8, progression: HOOK_CHORDS, melody: HOOK3, energy: 0.55 },
                 B: { bars: 8, progression: 'III VII IV i III VII v v', energy: 0.45, counter: 'harmony', endOn: 'dominant' },
             },
         },

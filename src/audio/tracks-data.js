@@ -9,15 +9,15 @@ export const TRACKS = {
         "file": "music/title.mp3",
         "title": "Babonk",
         "tempo": 132,
-        "beatsPerBar": 4,
+        "beatsPerBar": 3,
         "offset": 0.05,
         "end": null,
-        "seconds": 36.6637,
-        "frames": 1616867,
+        "seconds": 27.5727,
+        "frames": 1215957,
         "rate": 44100,
         "loop": {
-            "start": 7.32273,
-            "end": 36.41364
+            "start": 5.50455,
+            "end": 27.32273
         }
     },
     "well1": {
