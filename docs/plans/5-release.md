@@ -2,7 +2,7 @@
 
 ## Where things stand
 
-Babonk 1.0 is out (v1.0.0, then fixes in v1.0.1 and v1.0.2) and live on gridloc.dev. This stage is the bug fixes, balance, performance and final touches after it. Since 1.0, the code has been split into world, player and render layers with one folder per feature, each feature is tested through its contract, the graphics have quality presets with a frame-rate watchdog, the game installs to a home screen, and there is a gym and a museum beside the zoo (`docs/ARCHITECTURE.md#dev-rooms`). None of that changed how the game plays, looks or sounds; `just rooms` and the tests check it.
+Babonk 1.0 is out (v1.0.0, then fixes in v1.0.1 and v1.0.2, and v1.1.0 with the menus in the pixel font) and live on gridloc.dev. This stage is the bug fixes, balance, performance and final touches after it. Since 1.0, the code has been split into world, player and render layers with one folder per feature, each feature is tested through its contract, the graphics have quality presets with a frame-rate watchdog, the game installs to a home screen, and there is a gym and a museum beside the zoo (`docs/ARCHITECTURE.md#dev-rooms`). None of that changed how the game plays, looks or sounds; `just rooms` and the tests check it.
 
 Next: the play-tests below, then whatever they turn up.
 
