@@ -34,7 +34,7 @@ just test    # tests for lib/, *-data.js, the world and hero, and each feature t
 
 ## Debug flags
 
-Add `?debug` to the URL for a readout, a fixed seed and slow motion (`1`) or fast forward (`2`). `?debug&shot=bot` plays a run with a simple pilot, and `?debug&shot=zoo` shows every sprite and animation. The full list is in [architecture.md](architecture.md#debug-flags).
+Add `?debug` to the URL for a readout, a fixed seed and slow motion (`1`) or fast forward (`2`). `?debug&shot=bot` plays a run with a simple pilot, `?debug&shot=zoo` shows every sprite and animation, `?debug&room=gym` the movement numbers and `?debug&room=museum` each system working; `just rooms` runs them as smoke tests and screenshots them. The full list is in [architecture.md](architecture.md#debug-flags).
 
 ## Performance
 

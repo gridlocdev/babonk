@@ -68,6 +68,14 @@ music path=music_generator *tracks:
 icons:
     node tools/icons.mjs
 
+# the dev rooms as smoke tests (every gym case and museum exhibit through the real run), then a screenshot of each
+# room in the folder it prints
+rooms:
+    node --test test/dev/rooms.test.js
+    @[ -d node_modules/playwright ] || just install-bench
+    node tools/bench.mjs "debug&room=gym" "debug&room=gym&case=gap" "debug&room=gym&case=dash" "debug&room=gym&case=lock" "debug&room=gym&case=kill" "debug&room=museum" "debug&room=museum&exhibit=sealed" "debug&room=museum&exhibit=chain" "debug&room=zoo" --shots shots/rooms --settle 1.5 --seconds .5 --size 960x540 --dpr 1
+    @echo "screenshots in shots/rooms/"
+
 # run the tests: lib/, *-data.js, the world and hero, and each feature through its contract
 test:
     node --test

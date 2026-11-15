@@ -8,6 +8,8 @@ import { HERO } from './hero-data.js';
 
 export const heroBox = (w)=> ({ x: w.player.x, y: w.player.y, w: HERO.w, h: HERO.h });
 export const invulnerable = (w)=> w.t < w.player.invulnUntil;
+// put the hero's box at (x, y), still and in the air, for a scene built by hand (the dev rooms)
+export function placeHero(w, x, y) { Object.assign(w.player, { x, y, vx: 0, vy: 0, ground: false }); }
 
 // the foe a bonk would home in on: the nearest live one in reach, inside a cone around straight down, with nothing
 // solid in the way, so a homing bonk never dives through a ledge

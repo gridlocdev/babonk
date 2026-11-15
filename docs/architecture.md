@@ -24,7 +24,7 @@ src/
     stars/    stars knocked out of what you break: bursting, falling, pickup, drawing
     chain/    the bounce chain and its bonus
     run/      the run and its screens: title, play, pause, settings, rest, game over, initials and the top ten
-  dev/        ?debug tools, loaded only with that flag
+  dev/        ?debug tools, loaded only with that flag: the readout and keys (index.js), and the gym and museum rooms
   main.js     boot
 tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the rendered mp3s
 ```
@@ -75,6 +75,16 @@ The soundtrack is chiptune written as song specs for music-generator (`tools/mus
 
 `audio/music.js` plays on the effects' context (`sfx.context`, through `sfx.musicOut`, after their compressor), so it starts with the first key or tap and never with `?mute`. The area function decides the track; a change waits for the next bar line and crossfades, unless the track was marked with `musicCutIn`, which stops what is playing and starts at once, and is kept decoded from the start. Babonk sets it with `setMusicArea(musicFor)`: the title, a track per well, the rest, and one-shots for game over and the win. Its volume is the Music setting, and `setMusicDuck` lowers it under the pause menu. The mix: effects → their bus → a compressor, joined by the music after it → the Master gain → a limiter; the levels that balance the two are in `docs/audio.md`.
 
+## Dev rooms
+
+Three rooms show the game working, for answering a question with a screenshot instead of reading code: the zoo (every sprite, above), the gym and the museum. `dev/` sits above the features (`"top": ["dev"]` in `architecture.json`): it may import anything, reaches features only through `features/index.js`, and nothing imports it.
+
+- **The gym** (`dev/gym.js`) has a row per movement metric: jump height, running-jump gap and dash reach from the hero, lock range and what breaks which foe from the foes' `gym()` hook. Each case is coloured by its band, worked out in `dev/gym-data.js` from the hero's numbers: easy up to 80% of the reach, hard up to it, then no. Change a tuning number and the bands move with it.
+- **The museum** (`dev/museum.js`) has an exhibit per system, with a sign: the wall kick and a don't (a ledge wall to wall, built wrong on purpose) from `dev/`, and each feature's own through its `museum()` hook (a floater's tell, hit stop, the chain, stars).
+- A case or exhibit is a scripted try (`Trial` in `game/loop.js`): `start(w)` builds it in an empty well, `ctrl` is its input each step, `done` and `passed` judge it. `dev/scene.js` runs one in a real run with every part, and `dev/rooms.js` plays it in the browser on a loop; touch the stick or BONK to play it yourself.
+- `test/dev/rooms.test.js` is the smoke test: every gym case passes exactly when its band says it can be done, and every exhibit passes. `just rooms` runs it and screenshots every room into `shots/rooms/`.
+- A slice that changes movement, a foe or a system updates its room in the same change.
+
 ## Debug flags
 
 Add to the URL. `?debug` is needed for `shot`, `view`, `t` and `speed`.
@@ -84,7 +94,9 @@ Add to the URL. `?debug` is needed for `shot`, `view`, `t` and `speed`.
 | `?debug` | readout, `window.game`, a fixed seed, keys: 1 slow motion, 2 fast forward |
 | `?shot=play`, `bot`, `rest`, `over` | a run, a run played by a simple pilot, the rest between wells, the game over |
 | `?shot=pause`, `settings` | the pause menu over a run; settings over the title |
-| `?shot=zoo` | the sprite zoo: every animation, every frame, the cast at play size |
+| `?shot=zoo` or `?room=zoo` | the sprite zoo: every animation, every frame, the cast at play size |
+| `?room=gym`, `&case=<row>` | the gym, at a row: `jump`, `gap`, `dash`, `lock`, `kill` |
+| `?room=museum`, `&exhibit=<id>` | the museum, at an exhibit: `wallkick`, `sealed`, `tell`, `hitstop`, `chain`, `stars` |
 | `&view=gray`, `&view=silhouette` | on any screen: check whether values separate, and whether every sprite reads by its outline |
 | `&t=<seconds>` | with `shot=zoo`: freeze its clock, for stills of one frame |
 | `?speed=4` | game speed |

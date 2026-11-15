@@ -4,3 +4,6 @@ node_modules/
 # Claude Code: worktrees for isolated sessions, and personal settings
 .claude/worktrees/
 .claude/settings.local.json
+
+# screenshots from `just rooms` and `just bench --shots`
+shots/

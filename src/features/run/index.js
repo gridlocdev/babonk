@@ -21,7 +21,7 @@ import { RUN, clearBonus } from './run-data.js';
 
 const STEP = 1 / 60;
 
-let mode = 'menu';      // menu (the title) | play | rest | paused | settings | over | initials | zoo (debug)
+let mode = 'menu';      // menu (the title) | play | rest | paused | settings | over | initials | zoo | room (debug)
 let settingsFrom = 'menu';  // where settings goes back to: the title or the pause menu
 let modeTime = 0, acc = 0;
 let run = null, save = null, ctxState = null;
@@ -211,8 +211,10 @@ export default {
         musicCutIn('over');     // the run's end interrupts the well's music at once, no wait for the bar
         musicCutIn('win');
 
-        const start = FLAGS.debug ? FLAGS.params.get('shot') : null;
-        if (start === 'zoo') { touch.show(false); setMode('zoo'); }
+        const start = FLAGS.debug ? FLAGS.params.get('shot') : null, room = FLAGS.debug ? FLAGS.params.get('room') : null;
+        // the gym and museum (src/dev/rooms.js) run instead of the run
+        if (room === 'gym' || room === 'museum') setMode('room');
+        if (start === 'zoo' || room === 'zoo') { touch.show(false); setMode('zoo'); }
         else if (['play', 'bot', 'rest', 'over', 'pause'].includes(start)) startRun();
         if (start === 'pause') showPause();
         if (start === 'settings') openSettings('menu');
@@ -223,7 +225,7 @@ export default {
     update(dt)
     {
         modeTime += dt;
-        if (mode === 'zoo') return;
+        if (mode === 'zoo' || mode === 'room') return;
         if (mode === 'paused' || mode === 'settings' || mode === 'initials') { cards.update(); return; }
         if (mode === 'menu')
         {
@@ -246,6 +248,7 @@ export default {
     },
     draw(dt)
     {
+        if (mode === 'room') return;
         const word = pressWord(input.hasPad), hi = topScore(save.table);
         let ui;
         if (mode === 'menu' || mode === 'settings' && settingsFrom === 'menu') ui = { screen: 'title', prompt: word, hi, settingsWord: settingsWord(input.hasPad) };

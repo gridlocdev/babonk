@@ -176,7 +176,8 @@ function drawTitle(ui)
 }
 
 // draw a frame. ui: { screen: 'title' | 'play' | 'rest' | 'over' | 'zoo', prompt, hi, info,
-// view: '' | 'gray' | 'silhouette' (debug check views), t: a fixed zoo time for stills }
+// view: '' | 'gray' | 'silhouette' (debug check views), t: a fixed zoo time for stills,
+// overlay(g, ox, oy): drawn over the well with its origin, for the dev rooms' labels }
 export function render(w, ui, dt)
 {
     clock += dt;
@@ -197,6 +198,7 @@ export function render(w, ui, dt)
         shake = Math.max(0, shake - dt * 20);
         const sx = shake ? Math.round((Math.random() - .5) * shake) : 0, sy = shake ? Math.round((Math.random() - .5) * shake) : 0;
         drawWell(w, WELL_X + sx, -Math.round(camY) + sy);
+        ui.overlay?.(g, WELL_X + sx, -Math.round(camY) + sy);
         drawHud(w);
         if (ui.screen === 'rest')
         {

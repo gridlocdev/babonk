@@ -56,6 +56,10 @@ export function tileAt(well, tx, ty)
 }
 export const solid = (t)=> t !== EMPTY;
 export function setTile(well, tx, ty, t) { well.grid[ty * COLS + tx] = t; }
+/** sets tiles tx0..tx1 (inclusive) of row ty, as a ledge or a floor */
+export function fill(well, tx0, tx1, ty, t) { for (let tx = tx0; tx <= tx1; tx++) setTile(well, tx, ty, t); }
+/** empties everything inside the walls, for a scene built by hand (the dev rooms) */
+export function clearWell(well) { for (let ty = 0; ty < well.rows; ty++) fill(well, 1, COLS - 2, ty, EMPTY); }
 
 // the first solid tile a box (x, y, w, h) overlaps, or null
 export function hitTile(well, x, y, w, h)

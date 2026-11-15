@@ -1,9 +1,10 @@
 // Stars: knocked out of broken foes and crates, more the longer the chain. They fall and bounce like tiny foes, come to
 // you once you're near, and are worth points when taken.
-import { centre, move, overlap } from '../../world/well.js';
+import { BLOCK, CRATE, centre, fill, move, overlap, setTile } from '../../world/well.js';
 import { addRunPart, say } from '../../world/run.js';
-import { GRAVITY, MAX_FALL } from '../../world/wells-data.js';
-import { heroBox } from '../../player/hero.js';
+import { COLS, GRAVITY, MAX_FALL, TILE } from '../../world/wells-data.js';
+import { heroBox, placeHero } from '../../player/hero.js';
+import { HERO } from '../../player/hero-data.js';
 import { draw, frameOf } from '../../render/screen.js';
 import { addRunLayer } from '../../render/view.js';
 import { STARS } from './stars-data.js';
@@ -59,7 +60,34 @@ function drawStars(w, { ox, oy, clock })
     for (const s of w.stars) if (s.t < STARS.life - 1 || Math.floor(clock * 12) % 2) draw(frameOf('star', clock + s.x * .01), ox + Math.round(s.x), oy + Math.round(s.y));
 }
 
+// the museum (?debug&room=museum): a crate bonked open, its star bursting out and drifting to the hero
+/** @returns {import('../../game/loop.js').Exhibit[]} */
+function museum()
+{
+    return [{
+        id: 'stars', title: 'Stars', file: 'src/features/stars/index.js',
+        text: 'What you break bursts into stars, more the longer the chain. They drift to you once you are near, and blink out.',
+        start(w)
+        {
+            setTile(w, 9, 8, CRATE);
+            fill(w, 1, COLS - 2, 12, BLOCK);
+            placeHero(w, 9 * TILE + 1, 5 * TILE);
+            return { seen: 0, gone: -1, score: w.score };
+        },
+        ctrl: (w, s, n)=> ({ x: 0, y: 0, held: n === 0, pressed: n === 0 }),
+        done(w, s, n)
+        {
+            s.seen = Math.max(s.seen, w.stars.length);
+            if (s.seen && !w.stars.length && s.gone < 0) s.gone = n;
+            return s.gone >= 0;
+        },
+        // taken, not blinked out: gone before their life is up, and worth their points
+        passed: (w, s)=> s.seen > 0 && s.gone < STARS.life * 60 && w.score - s.score >= HERO.crate + STARS.points * s.seen,
+    }];
+}
+
 export default {
     id: 'stars',
     build() { addRunPart(part); addRunLayer(1, drawStars); },
+    museum,
 };

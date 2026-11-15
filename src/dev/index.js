@@ -1,4 +1,5 @@
-// ?debug only, never loaded by the shipped game: the live readout, the console hook and the debug keys.
+// ?debug only, never loaded by the shipped game: the live readout, the console hook, the debug keys and the rooms
+// (?debug&room=zoo | gym | museum).
 import { FLAGS } from '../platform/engine.js';
 import { graphics } from '../platform/graphics.js';
 
@@ -19,4 +20,7 @@ export function installDebug({ state, events, loop, clock, features })
         el.textContent = JSON.stringify(now).replace(/[{}"]/g, '').replace(/,/g, '  ');
     };
     setInterval(panel, 100);
+    // the gym and the museum take over from the run (the zoo is the run feature's own screen)
+    const room = FLAGS.params.get('room');
+    if (room === 'gym' || room === 'museum') import('./rooms.js').then(({ roomSystem })=> loop.use([roomSystem(room, features)]));
 }
