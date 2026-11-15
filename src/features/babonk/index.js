@@ -240,8 +240,7 @@ export default {
         else if (mode === 'over' || mode === 'initials') ui = { screen: 'over', prompt: mode === 'over' && modeTime > 1.2 ? word : '', info: result, hi: Math.max(hi, result.score) };
         else if (mode === 'zoo') ui = { screen: 'zoo', t: ZOO_T };
         else ui = { screen: 'play', hi };
-        ui.view = VIEW;
-        render(run, ui, dt);
+        render(run, { ...ui, view: VIEW }, dt);
     },
     debug() { return { mode, well: run?.well, t: +(run?.t ?? 0).toFixed(1), score: run?.score, hp: run?.hp, chain: run?.chain, y: Math.round(run?.player.y ?? 0) }; },
 };

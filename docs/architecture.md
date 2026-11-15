@@ -35,7 +35,7 @@ tools/music/ the soundtrack's song specs (songs.js) and the renderer; music/ the
 
 ## Checking
 
-`just check` (syntax and layer rules, `tools/coupling-report.mjs` with `architecture.json`) and `just test`. `just dead` lists modules, exports and assets nothing uses.
+`just check` (syntax, layer rules through `tools/coupling-report.mjs` with `architecture.json`, and types: `tsc` checks the plain JavaScript and its JSDoc against `jsconfig.json`, emitting nothing) and `just test`. `just dead` lists modules, exports and assets nothing uses.
 
 `just bench` times frames in Playwright's Firefox, pinned through `package.json` (`just install-bench` once): headless, muted, a fresh profile, at 1440x900 and pixel ratio 2 unless `--size` and `--dpr` say otherwise. Each argument is a run (`"debug&shot=bot"`); add `|js` to change the page before timing, `--repeat 2` to interleave runs through a busy machine, `--shots DIR` to save a screenshot of each, and `--touch` to pretend to be a phone so the touch controls show. It prints page and console errors. 60 fps with p95 under ~18 ms is healthy; every screen holds that.
 
