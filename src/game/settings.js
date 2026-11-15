@@ -1,4 +1,4 @@
-// The player's settings: the shared table in lib/settings.js with Babonk's changes (docs/SETTINGS.md).
+// The player's settings: the shared table in lib/settings.js with Babonk's changes (docs/settings.md).
 // This module owns the live values: it loads them, hands them out and emits 'settings:changed' { id, value } so audio,
 // the screen and input apply their own parts. Features read settings; only the settings screen changes them.
 import {

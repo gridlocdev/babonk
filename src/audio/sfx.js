@@ -3,7 +3,7 @@
 //
 // The mix: effects → their bus (EFFECTS_LEVEL × Effects volume) → a compressor ┐
 //          music (audio/music.js, its own level × Music volume) → musicOut ─────┴→ master (Master volume) → a limiter → out
-// The two levels set where effects sit against the music at the default volumes (measured, see docs/AUDIO.md).
+// The two levels set where effects sit against the music at the default volumes (measured, see docs/audio.md).
 // Settings (game/settings.js) apply here: the three volumes, Mono audio, and Play in the background.
 import { FLAGS } from '../platform/engine.js';
 import { RATE } from '../lib/synth.js';

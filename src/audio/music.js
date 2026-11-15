@@ -21,7 +21,7 @@ const nearness = (name)=> 0;
 let audioContext = null, audioMasterGain = null;
 
 const LEVEL = 1.6;          // the music bus at full Music volume. Set against the effects' level in audio/sfx.js so
-                            // the two sit close at the default volumes (docs/AUDIO.md)
+                            // the two sit close at the default volumes (docs/audio.md)
 const SLIDE = .05;          // seconds (time constant) for a slider change to settle
 const MAX_WAIT = 2.5;       // seconds; when a bar is longer than this, a change waits for the next beat instead
 const FADE = [1.2, 3];      // seconds; an old track fades out over a bar, kept inside these

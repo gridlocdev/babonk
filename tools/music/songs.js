@@ -1,5 +1,5 @@
 // The soundtrack as song specs for music-generator's composer (its docs/COMPOSING.md, "The song spec").
-// tools/music/render.mjs composes and renders each one to music/<id>.mp3; `just music` runs it. docs/AUDIO.md has the
+// tools/music/render.mjs composes and renders each one to music/<id>.mp3; `just music` runs it. docs/audio.md has the
 // direction: arcade plunge, D dorian on the bare chip voices, one bouncing-then-falling hook in every track.
 //
 // id: the track's name; the area's track or a cue's name.

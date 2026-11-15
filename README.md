@@ -1,31 +1,28 @@
 # Babonk
 
-Fall down three wells in big three-colour pixels. Bonk in midair to home in on a foe, or dash, and bounce off foes, walls and floors to stay up. Break foes and crates in a chain for stars and points, rest between wells, and put your initials in the top ten.
+Fall down three wells in big three-colour pixels, and never touch the ground. Bonk in midair to home in on a foe, bounce off it, and keep the chain going for stars and points.
 
-## Run it
+![Babonk mid-run: a narrow well of pale mint brick walls on a blue-black ground. The hero falls between two ledges, a green lock-on frame around the foe just below it. On the left the HUD shows four HP squares, the bonk ready and a x2 chain; on the right the score of 110, well 1 of 3, and a depth gauge.](docs/images/babonk.webp)
 
-It's plain ES modules with nothing to build, but they don't load from `file://`, so serve the folder:
+- **One button in the air.** Press **BONK** to home in on the nearest foe in reach, or dash the way you hold when none is.
+- **Bounce to stay up.** Foes, walls, floors and crates all bounce you back and give the bonk back; breaking foes and crates builds a chain.
+- **Three wells, one run.** Each well is deeper and meaner, with a rest and +1 HP between them and a top-ten table at the end.
+
+## Getting started
+
+Play it in the browser at [gridloc.dev/games/babonk](https://gridloc.dev/games/babonk/), or run it from source:
 
 ```bash
-just serve
+just play   # serve on http://localhost:8141 and open it
 ```
 
-Then open http://localhost:8141. (`just play` serves it and opens the browser; `just lan` serves it to a phone on the same Wi-Fi.)
+See [Getting started](docs/getting-started.md) for other ways to run it, including on a phone.
 
-## Controls
+## Learn more
 
-| | Keyboard and mouse | Gamepad | Touch |
-|---|---|---|---|
-| Move, aim a dash | WASD or arrows | Left stick or d-pad | Stick |
-| Jump (on the ground), bonk (in the air) | Space, J, Shift or the mouse button | A or right trigger | BONK |
-| Start, go on | Space or Enter | A | BONK |
-| Pause | Esc or P | Start | Pause button |
-| Menus | Arrows, Space or Enter, Esc to go back | D-pad or stick, A, B | Tap |
+- [Features](docs/features.md) · [Controls](docs/controls.md) · [Settings](docs/settings.md)
+- [All documentation](docs/README.md) · [Working on the code](docs/development.md)
 
-## Credits
+## License
 
-The music is chiptune composed and rendered with [music-generator](https://github.com/gridlocdev/music-generator), on its chip instruments, which are made in code.
-
-## For developers
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+[MIT](LICENSE)

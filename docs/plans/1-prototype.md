@@ -14,13 +14,13 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 
 ## Done: music
 
-- [x] Chiptune soundtrack in D dorian from one hook (`docs/AUDIO.md`): title, one loop per well, the rest, game-over and win stings, rendered with music-generator (`just music`).
+- [x] Chiptune soundtrack in D dorian from one hook (`docs/audio.md`): title, one loop per well, the rest, game-over and win stings, rendered with music-generator (`just music`).
 - [x] It follows the screens and changes on the bar; Music on/off in the pause menu, kept in the save.
 - [x] The wells darker (D minor, phrygian, harmonic minor) and in 5/4 and 3/4, with hand-written drums.
 
 ## Done: settings and the mix
 
-- [x] Settings on the shared settings table (`docs/SETTINGS.md`): tabs for Audio, Controls, Display and Accessibility; rows for volumes, mono, background sound, stick dead zone, brightness, frame rate, full screen, screen shake, reduce flashing and game speed. Keys and pad (hold to repeat, Q/E or LB/RB for tabs), click or drag, touch. Reset per tab after a second press.
+- [x] Settings on the shared settings table (`docs/settings.md`): tabs for Audio, Controls, Display and Accessibility; rows for volumes, mono, background sound, stick dead zone, brightness, frame rate, full screen, screen shake, reduce flashing and game speed. Keys and pad (hold to repeat, Q/E or LB/RB for tabs), click or drag, touch. Reset per tab after a second press.
 - [x] Only changed values saved, in `core.settings`; older saves carried over; reduced motion turns shake off and flashing down by default.
 - [x] Pause: Continue, Settings, Restart, Quit to title, the last two confirmed; the music drops under it. Leaving the tab mid-run pauses it, and sound stops unless Play in the background is on.
 - [x] Effects brought down and music up, from 12 dB apart to about 2; a limiter on the output.
@@ -47,6 +47,6 @@ Babonk began as the third cabinet in a walkable 3D arcade. Decided: it becomes i
 ## Follow-ups
 
 - [ ] Babonk has 13 chunks. More, and a few per well with a new idea (moving blocks, crumbling ledges), would keep runs from repeating.
-- [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/SETTINGS.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
+- [ ] Settings the game can't apply yet, removed in `game/settings.js` (`docs/settings.md`): difficulty presets, rumble, text size, high contrast, plain font. Add each back when the game can honour it.
 - [ ] On the title, the touch pause button now opens Settings but still shows the pause bars; a gear there would read better.
 - [ ] A home-screen icon and web manifest.

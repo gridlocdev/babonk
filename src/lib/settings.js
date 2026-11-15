@@ -1,6 +1,6 @@
 // The standard settings every game shares: the same ids, groups, ranges and defaults, so a player meets the same
 // settings screen in each game and the save format never differs. Pure data and functions, no engine or DOM, so tests
-// run in node. What each setting does and where the game applies it is in docs/SETTINGS.md.
+// run in node. What each setting does and where the game applies it is in docs/settings.md.
 //
 // A settings object is flat: { 'audio.music': 0.7, 'a11y.plainFont': false, ... }. Only the values the player changed
 // are saved, in state.slice('core').settings, so a setting added later gets its default and a changed default reaches

@@ -1,4 +1,4 @@
-// The settings screen (docs/SETTINGS.md): a tab per group (Audio, Controls, Display, Accessibility), a row per setting
+// The settings screen (docs/settings.md): a tab per group (Audio, Controls, Display, Accessibility), a row per setting
 // with its label on the left and its value on the right, a help line, and Reset to defaults at the end of each tab.
 //
 // Up and down move between rows; left and right change the focused value, one step a press, repeating while held;
