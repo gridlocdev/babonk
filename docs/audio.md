@@ -24,7 +24,7 @@ One home key (D), one motif (the hook's first bar, `1:0.5 5:0.5 8 7:0.5 5:0.5 3`
 | `well2` | well 2 | the motif, sequenced | D phrygian (flat 2nd), 150 bpm, PWM lead, rimclicks and low toms, snare saved for the hook |
 | `well3` | well 3 | the hook, in 5/4, angry | D harmonic minor, 162 bpm, DPCM bass and kit in double time, claps |
 | `rest` | between wells | the motif's steps | F major (the relative), a 3/4 music box at 84 bpm, no drums |
-| `over` | game over (once) | the hook's fall | D harmonic minor, slow, slowing to a stop |
+| `over` | game over (once) | the bounce, then it deflates | D major, quick and playful, a shrug over the borrowed iv and a cheeky octave hop |
 | `win` | the run won (once) | the bounce | D major, 150 bpm, ends an octave up |
 
 ## What the music follows

@@ -230,16 +230,17 @@ export const TRACKS = [
         },
     },
     {
-        // Game over: out of HP somewhere in the dark. The hook's fall, slow, in harmonic minor, slowing to a stop.
+        // Game over: out of HP, bonked one time too many. A shrug, not a funeral: the bounce in D major, quick and
+        // bright, then it deflates over the borrowed minor iv and tumbles down the scale, a cheeky octave hop to close.
         id: 'over', loop: null,
         spec: {
-            title: 'Bonked', sound: 'chip', key: 'D', mode: 'harmonicMinor', emotion: 'melancholy', tempo: 84, groove: 'ballad',
-            comp: 'sustain', arp: 'tracker', legato: 0.9, dynamics: 0.5, ritardando: true,
-            band: { lead: 80, counter: null, arp: 83, chords: null, pad: 90, bass: 38, drums: null },
+            title: 'Bonked', sound: 'chip', key: 'D', mode: 'major', emotion: 'playful', tempo: 150, groove: 'bounce',
+            comp: 'offbeat', arp: 'tracker', legato: 0.6, dynamics: 0.7, ritardando: true,
+            band: { lead: 86, counter: null, arp: 82, chords: null, pad: null, bass: 38, drums: 1 },
             form: ['A', 'outro'],
             sections: {
-                A: { bars: 2, progression: 'i iv', melody: '8:0.5 7:0.5 5 3:0.5 2:0.5 1 | 4:1.5 3:0.5 2 #7,', energy: 0.5 },
-                outro: { bars: 2, progression: 'V i', melody: '2:2 #7,:2 | 1:4', energy: 0.35 },
+                A: { bars: 2, progression: 'I IV:0.5 iv:0.5', melody: BOUNCE + ' | 4:0.5 6:0.5 8 b6:0.5 5:0.5 4', energy: 0.7 },
+                outro: { bars: 2, progression: 'V7 I', melody: '5:0.5 4:0.5 3:0.5 2:0.5 7,:1 5,:1 | 1:0.5 r:0.5 8:0.5 r:2.5', energy: 0.6 },
             },
         },
     },

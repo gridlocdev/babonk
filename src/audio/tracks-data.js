@@ -213,12 +213,12 @@ export const TRACKS = {
     "over": {
         "file": "music/over.mp3",
         "title": "Bonked",
-        "tempo": 84,
+        "tempo": 150,
         "beatsPerBar": 4,
         "offset": 0.05,
-        "end": 11.8115,
-        "seconds": 15.8115,
-        "frames": 697288,
+        "end": 6.67145,
+        "seconds": 10.6715,
+        "frames": 470611,
         "rate": 44100,
         "loop": null
     },
